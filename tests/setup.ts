@@ -1,0 +1,3 @@
+/**
+ * Vitest global test setup
+ */
