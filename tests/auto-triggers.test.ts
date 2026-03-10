@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { CMSDataLayer } from "@/lib/analytics/data-layer";
+import { CMSDataLayer } from "@otl-core/analytics";
 import { setupAutoTriggers } from "@/lib/analytics/auto-triggers";
 import type { AutoEventSettings } from "@otl-core/cms-types";
 

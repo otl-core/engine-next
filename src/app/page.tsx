@@ -3,15 +3,18 @@ import { sectionRegistry } from "@/lib/registries/section-registry";
 import {
   getABnBucket,
   hasValidPasswordCookie,
-  isMultivariateContent,
-  resolveFormVariantsInSections,
-  resolvePageVariant,
   resolvePath,
   parsePageContent,
 } from "@otl-core/engine-next-utils";
 import { ABnVariantSetter } from "@otl-core/analytics";
 import type { SchemaInstance } from "@otl-core/cms-types";
-import { isContentVisible, isPasswordProtected } from "@otl-core/cms-utils";
+import {
+  isContentVisible,
+  isMultivariateContent,
+  isPasswordProtected,
+  resolveFormVariantsInSections,
+  resolvePageVariant,
+} from "@otl-core/cms-utils";
 import { generatePageMetadata } from "@/lib/seo/metadata";
 import PasswordPrompt from "@/components/password/password-prompt";
 import { PageRenderer } from "@otl-core/section-registry";

@@ -9,7 +9,7 @@ import {
   cn,
   normalizeResponsiveValue,
   resolveColorToCSS,
-} from "@otl-core/cms-utils";
+} from "@otl-core/style-utils";
 import { BREAKPOINTS } from "@/lib/breakpoints";
 import { ReactNode } from "react";
 

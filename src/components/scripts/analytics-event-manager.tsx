@@ -16,8 +16,8 @@ import type {
 } from "@otl-core/cms-types";
 import { PROVIDER_EVENT_MAPPINGS } from "@otl-core/script-utils";
 import { useConsent } from "@/lib/consent";
+import { dataLayer } from "@otl-core/analytics";
 import {
-  dataLayer,
   createProviderAdapter,
   setupAutoTriggers,
   setupEventRules,

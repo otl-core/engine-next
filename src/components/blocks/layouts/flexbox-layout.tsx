@@ -6,7 +6,7 @@
 
 import { BlockRegistry, BlockRenderer } from "@otl-core/block-registry";
 import type { BlockInstance, ResponsiveValue } from "@otl-core/cms-types";
-import { cn } from "@otl-core/cms-utils";
+import { cn } from "@otl-core/style-utils";
 import { BREAKPOINTS } from "@/lib/breakpoints";
 
 export interface FlexboxLayoutConfig {

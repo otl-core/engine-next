@@ -14,7 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAnalytics } from "@otl-core/analytics";
-import { cn } from "@otl-core/cms-utils";
+import { cn } from "@otl-core/style-utils";
 import { BlockRegistry, BlockRenderer } from "@otl-core/block-registry";
 import { BlockInstance } from "@otl-core/cms-types";
 import { useCallback } from "react";

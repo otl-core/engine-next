@@ -202,18 +202,20 @@ function FormRenderer({
               className="flex items-center justify-center"
               style={{ gap: "1rem" }}
             >
-              {progressPages.map((page, index: number) => (
-                <div
-                  key={page.id}
-                  className={`w-3 h-3 rounded-full transition-colors ${
-                    index === currentProgressIndex
-                      ? "bg-primary"
-                      : index < currentProgressIndex
-                        ? "bg-primary/50"
-                        : "bg-muted"
-                  }`}
-                />
-              ))}
+              {progressPages.map((page, index: number) => {
+                let dotColor = "bg-muted";
+                if (index === currentProgressIndex) {
+                  dotColor = "bg-primary";
+                } else if (index < currentProgressIndex) {
+                  dotColor = "bg-primary/50";
+                }
+                return (
+                  <div
+                    key={page.id}
+                    className={`w-3 h-3 rounded-full transition-colors ${dotColor}`}
+                  />
+                );
+              })}
             </div>
           )}
         </div>

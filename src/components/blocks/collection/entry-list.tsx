@@ -1,8 +1,5 @@
 import type { BlockComponentProps } from "@otl-core/cms-types";
-import {
-  filterScheduledContent,
-  filterPasswordProtectedContent,
-} from "@otl-core/cms-utils";
+import { isContentVisible, isPasswordProtected } from "@otl-core/cms-utils";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -80,8 +77,15 @@ export function EntryListBlock({ config }: EntryListProps) {
   const allEntries = data?.items || [];
 
   // Filter out scheduled, expired, and password-protected entries at render time
-  const scheduledFiltered = filterScheduledContent(allEntries);
-  const entries = filterPasswordProtectedContent(scheduledFiltered);
+  const entries = allEntries.filter(
+    (entry: {
+      publish_at?: string;
+      expires_at?: string;
+      password_protected?: boolean;
+    }) =>
+      isContentVisible(entry.publish_at, entry.expires_at) &&
+      !isPasswordProtected(entry.password_protected),
+  );
 
   if (entries.length === 0) return null;
 

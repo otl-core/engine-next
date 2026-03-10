@@ -6,7 +6,7 @@
 
 import { BlockRegistry, BlockRenderer } from "@otl-core/block-registry";
 import type { BlockInstance, ResponsiveValue } from "@otl-core/cms-types";
-import { cn, normalizeResponsiveValue } from "@otl-core/cms-utils";
+import { cn, normalizeResponsiveValue } from "@otl-core/style-utils";
 import { BREAKPOINTS } from "@/lib/breakpoints";
 
 export interface ContainerLayoutConfig {

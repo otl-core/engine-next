@@ -6,7 +6,7 @@
 
 import { BlockRegistry, BlockRenderer } from "@otl-core/block-registry";
 import type { BlockInstance, ResponsiveValue } from "@otl-core/cms-types";
-import { cn } from "@otl-core/cms-utils";
+import { cn } from "@otl-core/style-utils";
 import { BREAKPOINTS } from "@/lib/breakpoints";
 
 // --- Types ---
@@ -142,32 +142,26 @@ export default function GridLayout({
     return null;
   }
 
-  const alignmentClass =
-    alignItems === "center"
-      ? "items-center"
-      : alignItems === "end"
-        ? "items-end"
-        : alignItems === "stretch"
-          ? "items-stretch"
-          : "items-start";
+  const alignmentMap: Record<string, string> = {
+    center: "items-center",
+    end: "items-end",
+    stretch: "items-stretch",
+  };
+  const alignmentClass = alignmentMap[alignItems] || "items-start";
 
-  const justifyClass =
-    justifyItems === "center"
-      ? "justify-items-center"
-      : justifyItems === "end"
-        ? "justify-items-end"
-        : justifyItems === "stretch"
-          ? "justify-items-stretch"
-          : justifyItems === "start"
-            ? "justify-items-start"
-            : "";
+  const justifyMap: Record<string, string> = {
+    center: "justify-items-center",
+    end: "justify-items-end",
+    stretch: "justify-items-stretch",
+    start: "justify-items-start",
+  };
+  const justifyClass = (justifyItems && justifyMap[justifyItems]) || "";
 
-  const autoFlowClass =
-    autoFlow === "column"
-      ? "grid-flow-col"
-      : autoFlow === "dense"
-        ? "grid-flow-dense"
-        : "";
+  const autoFlowMap: Record<string, string> = {
+    column: "grid-flow-col",
+    dense: "grid-flow-dense",
+  };
+  const autoFlowClass = (autoFlow && autoFlowMap[autoFlow]) || "";
 
   return (
     <div

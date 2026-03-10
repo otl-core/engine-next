@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { CMSDataLayer } from "@/lib/analytics/data-layer";
-import type { DataLayerEntry } from "@/lib/analytics/data-layer";
+import { CMSDataLayer } from "@otl-core/analytics";
+import type { DataLayerEntry } from "@otl-core/analytics";
 
 describe("CMSDataLayer", () => {
   function createEntry(

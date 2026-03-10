@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 /**
  * ads.txt - Digital advertising authorization
  * Used by ad networks to verify authorized sellers.
- * Content is fully configurable per site via the management app.
+ * Content is fully configurable per site via the studio.
  */
 export async function GET() {
   try {

@@ -15,7 +15,7 @@ import {
   PROVIDER_EVENT_MAPPINGS,
   type ProviderEventMapping,
 } from "@otl-core/script-utils";
-import type { DataLayerEntry } from "./data-layer";
+import type { DataLayerEntry } from "@otl-core/analytics";
 
 declare global {
   interface Window {

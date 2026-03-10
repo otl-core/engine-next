@@ -93,7 +93,7 @@ async function tryStaleCache(
     });
 
     if (staleResponse.ok) {
-      console.log("[sitemap] Serving stale cached sitemap");
+      console.warn("[sitemap] Serving stale cached sitemap");
       return staleResponse.text();
     }
   } catch {

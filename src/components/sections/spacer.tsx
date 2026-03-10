@@ -8,7 +8,7 @@ import type {
   SectionBaseConfig,
   SectionComponentProps,
 } from "@otl-core/cms-types";
-import { normalizeResponsiveValue } from "@otl-core/cms-utils";
+import { normalizeResponsiveValue } from "@otl-core/style-utils";
 import { BREAKPOINTS } from "@/lib/breakpoints";
 import SectionWrapper from "./section-wrapper";
 

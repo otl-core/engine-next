@@ -2,12 +2,45 @@ import {
   ColorConfig,
   ColorReference,
   FontConfig,
+  ResponsiveValue,
   ThemeColor,
   ThemeConfig,
   ThemeSlots,
 } from "@otl-core/cms-types";
 
 const DEFAULT_COLOR = "#cccccc";
+
+const BREAKPOINT_WIDTHS: Record<string, string> = {
+  sm: "640px",
+  md: "768px",
+  lg: "1024px",
+  xl: "1280px",
+  "2xl": "1536px",
+};
+
+function generateContainerPaddingCSS(
+  containerPadding: ResponsiveValue<string> | undefined,
+): string {
+  if (!containerPadding) return "";
+
+  if (typeof containerPadding === "string") {
+    return `:root { --container-padding: ${containerPadding}; }`;
+  }
+
+  const css: string[] = [];
+  if (containerPadding.base) {
+    css.push(`:root { --container-padding: ${containerPadding.base}; }`);
+  }
+  for (const [bp, width] of Object.entries(BREAKPOINT_WIDTHS)) {
+    const val = containerPadding[bp as keyof typeof containerPadding];
+    if (val) {
+      css.push(
+        `@media (min-width: ${width}) { :root { --container-padding: ${val}; } }`,
+      );
+    }
+  }
+  return css.join("\n");
+}
 
 /**
  * Resolves a ColorReference to its actual color value
@@ -335,7 +368,11 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             ${colorVarsLight}
             
             /* Border radius */
-            --radius: ${theme.radius};
+            --radius-sm: ${typeof theme.radius === "string" ? theme.radius : theme.radius.sm};
+            --radius-md: ${typeof theme.radius === "string" ? theme.radius : theme.radius.md};
+            --radius-lg: ${typeof theme.radius === "string" ? theme.radius : theme.radius.lg};
+            --radius-xl: ${typeof theme.radius === "string" ? theme.radius : theme.radius.xl};
+            ${typeof theme.radius !== "string" && theme.radius.full === false ? `--radius-full: ${theme.radius.xl};` : ""}
             
             /* Theme slots (light mode) */
             --surface: ${resolvedLight.surface};
@@ -785,8 +822,11 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             --card-foreground: ${getForeground(darkSlots.card, "dark")};
             --destructive: ${resolvedDark.destructive};
             --destructive-foreground: ${getForeground(darkSlots.destructive, "dark")};
-            
+
         }
+
+        /* Container padding */
+        ${generateContainerPaddingCSS(theme.containerPadding)}
         `,
       }}
     />

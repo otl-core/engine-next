@@ -27,6 +27,8 @@ export function ConsentBanner({ config, locale }: ConsentBannerProps) {
     useConsent();
 
   const [showPreferences, setShowPreferences] = useState(false);
+  // Local-only dismiss — no cookie written, banner reappears on next page load
+  const [dismissed, setDismissed] = useState(false);
   const [preferencesState, setPreferencesState] =
     useState<ConsentState>(consentState);
 
@@ -88,138 +90,152 @@ export function ConsentBanner({ config, locale }: ConsentBannerProps) {
     return buildLegalLinks(config, texts);
   }, [config, texts]);
 
+  const layout = config?.layout || "bar";
+  const position = config?.position || "bottom";
+
   const containerClasses = useMemo(
     () =>
-      [
-        getContainerClasses(
-          config?.layout || "bar",
-          config?.position || "bottom",
-        ),
-        config?.custom_css_class || "",
-      ]
+      [getContainerClasses(layout, position), config?.custom_css_class || ""]
         .join(" ")
         .trim(),
-    [config?.layout, config?.position, config?.custom_css_class],
+    [layout, position, config?.custom_css_class],
   );
 
-  if (!config || !config.enabled || hasConsented || !texts) return null;
+  if (!config || !config.enabled || hasConsented || dismissed || !texts)
+    return null;
 
-  return (
+  const bannerContent = (
     <>
-      {config.layout === "modal" && (
-        <div className="fixed inset-0 z-9998 bg-black/50" aria-hidden="true" />
-      )}
-
-      {config.block_interaction && config.layout !== "modal" && (
-        <div className="fixed inset-0 z-9998" aria-hidden="true" />
-      )}
-
-      <div
-        role="dialog"
-        aria-modal={config.layout === "modal" ? "true" : undefined}
-        aria-label={texts.title}
-        className={`${containerClasses} relative`}
-      >
-        {config.show_close_button && (
-          <button
-            type="button"
-            onClick={handleRejectAll}
-            className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 rounded-sm"
-            aria-label={texts.close_button_label || "Close"}
+      {config.show_close_button && (
+        <button
+          type="button"
+          onClick={() => {
+            setDismissed(true);
+          }}
+          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 rounded-sm"
+          aria-label={texts.close_button_label || "Close"}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      )}
+
+      {showPreferences ? (
+        <PreferencesPanel
+          texts={texts}
+          state={preferencesState}
+          onToggle={handleToggleCategory}
+          onSave={handleSavePreferences}
+          onBack={() => setShowPreferences(false)}
+        />
+      ) : (
+        <div className="flex flex-col gap-4">
+          <div>
+            {config.logo_url && (
+              // eslint-disable-next-line @next/next/no-img-element -- dynamic CMS logo URL, next/image requires per-domain config
+              <img
+                src={config.logo_url}
+                alt=""
+                className="h-8 w-auto mb-2"
+                aria-hidden="true"
               />
-            </svg>
-          </button>
-        )}
+            )}
+            <h2 className="text-lg font-semibold text-gray-900">
+              {texts.title}
+            </h2>
+            <p className="mt-1 text-sm text-gray-600">{texts.description}</p>
+            {legalLinks.length > 0 && (
+              <p className="mt-2 text-xs text-gray-500">
+                {legalLinks.map((link, i) => (
+                  <span key={link.url}>
+                    {i > 0 && <span className="mx-1">|</span>}
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-gray-700"
+                    >
+                      {link.label}
+                    </a>
+                  </span>
+                ))}
+              </p>
+            )}
+          </div>
 
-        {showPreferences ? (
-          <PreferencesPanel
-            texts={texts}
-            state={preferencesState}
-            onToggle={handleToggleCategory}
-            onSave={handleSavePreferences}
-            onBack={() => setShowPreferences(false)}
-          />
-        ) : (
-          <div className="flex flex-col gap-4">
-            <div>
-              {config.logo_url && (
-                <img
-                  src={config.logo_url}
-                  alt=""
-                  className="h-8 w-auto mb-2"
-                  aria-hidden="true"
-                />
-              )}
-              <h2 className="text-lg font-semibold text-gray-900">
-                {texts.title}
-              </h2>
-              <p className="mt-1 text-sm text-gray-600">{texts.description}</p>
-              {legalLinks.length > 0 && (
-                <p className="mt-2 text-xs text-gray-500">
-                  {legalLinks.map((link, i) => (
-                    <span key={link.url}>
-                      {i > 0 && <span className="mx-1">|</span>}
-                      <a
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline hover:text-gray-700"
-                      >
-                        {link.label}
-                      </a>
-                    </span>
-                  ))}
-                </p>
-              )}
-            </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={handleAcceptAll}
+              className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm font-medium text-[var(--primary-foreground)] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2"
+            >
+              {texts.accept_all_label}
+            </button>
 
-            <div className="flex flex-wrap items-center gap-2">
+            {config.show_reject_all && (
               <button
                 type="button"
-                onClick={handleAcceptAll}
-                className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
+                onClick={handleRejectAll}
+                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
               >
-                {texts.accept_all_label}
+                {texts.reject_all_label}
               </button>
+            )}
 
-              {config.show_reject_all && (
-                <button
-                  type="button"
-                  onClick={handleRejectAll}
-                  className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
-                >
-                  {texts.reject_all_label}
-                </button>
-              )}
-
-              {config.show_preferences && (
-                <button
-                  type="button"
-                  onClick={handleOpenPreferences}
-                  className="rounded-md px-4 py-2 text-sm font-medium text-gray-600 underline transition-colors hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
-                >
-                  {texts.preferences_label}
-                </button>
-              )}
-            </div>
+            {config.show_preferences && (
+              <button
+                type="button"
+                onClick={handleOpenPreferences}
+                className="text-sm font-medium text-gray-600 underline transition-colors hover:text-gray-900 focus:outline-none"
+              >
+                {texts.preferences_label}
+              </button>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </>
   );
+
+  const showBackdrop = config.layout === "modal" || config.block_interaction;
+
+  const dialog = (
+    <div
+      role="dialog"
+      aria-modal={config.layout === "modal" ? "true" : undefined}
+      aria-label={texts.title}
+      className={containerClasses}
+    >
+      {layout === "bar" || layout === "sheet" ? (
+        <div className="container mx-auto">{bannerContent}</div>
+      ) : (
+        bannerContent
+      )}
+    </div>
+  );
+
+  if (showBackdrop) {
+    return (
+      <div className="fixed inset-0 z-[9999]">
+        <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
+        {dialog}
+      </div>
+    );
+  }
+
+  return dialog;
 }
 
 interface PreferencesPanelProps {
@@ -297,10 +313,10 @@ function PreferencesPanel({
                   className={[
                     "h-5 w-9 rounded-full transition-colors",
                     "after:absolute after:left-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform",
-                    "peer-checked:bg-gray-900 peer-checked:after:translate-x-4",
+                    "peer-checked:bg-[var(--primary)] peer-checked:after:translate-x-4",
                     isNecessary
                       ? "bg-gray-400 opacity-60"
-                      : "bg-gray-300 peer-focus:ring-2 peer-focus:ring-gray-900 peer-focus:ring-offset-2",
+                      : "bg-gray-300 peer-focus:ring-2 peer-focus:ring-[var(--primary)] peer-focus:ring-offset-2",
                   ].join(" ")}
                 />
               </label>
@@ -312,7 +328,7 @@ function PreferencesPanel({
       <button
         type="button"
         onClick={onSave}
-        className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
+        className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm font-medium text-[var(--primary-foreground)] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2"
       >
         {texts.save_preferences_label}
       </button>
@@ -359,32 +375,48 @@ function getContainerClasses(
   layout: ConsentBannerConfig["layout"],
   position: ConsentBannerConfig["position"],
 ): string {
-  const base = "fixed z-[9999] bg-white p-6 shadow-lg";
+  const base = "fixed z-60 bg-white shadow-lg";
 
   switch (layout) {
+    // Bar: full-width top or bottom, content constrained via inner .container
     case "bar":
       if (position === "top") {
-        return `${base} inset-x-0 top-0 border-b border-gray-200`;
+        return `${base} inset-x-0 top-0 py-6 border-b border-gray-200`;
       }
-      // bottom (default for bar -- other positions fall back to bottom)
-      return `${base} inset-x-0 bottom-0 border-t border-gray-200`;
+      return `${base} inset-x-0 bottom-0 py-6 border-t border-gray-200`;
 
+    // Box: near-full-width on mobile (with margin), max-w-md positioned on desktop
     case "box":
-      return `${base} max-w-md rounded-lg border border-gray-200 ${getBoxPositionClasses(position)}`;
+      return `${base} p-6 rounded-lg border border-gray-200 max-md:left-4 max-md:right-4 ${getMobileBoxPosition(position)} md:max-w-md ${getBoxPositionClasses(position)}`;
 
+    // Modal: always centered
     case "modal":
-      return `${base} left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg border border-gray-200`;
+      return `${base} p-6 left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg border border-gray-200`;
 
+    // Sheet: always bottom
     case "sheet":
-      // Sheet slides in from the edge
-      if (position === "top") {
-        return `${base} inset-x-0 top-0 max-h-[80vh] overflow-y-auto rounded-b-lg border-b border-gray-200`;
-      }
-      // Default: sheet from bottom
-      return `${base} inset-x-0 bottom-0 max-h-[80vh] overflow-y-auto rounded-t-lg border-t border-gray-200`;
+      return `${base} py-6 inset-x-0 bottom-0 max-h-[80vh] overflow-y-auto rounded-t-lg border-t border-gray-200`;
 
     default:
-      return `${base} inset-x-0 bottom-0 border-t border-gray-200`;
+      return `${base} inset-x-0 bottom-0 py-6 border-t border-gray-200`;
+  }
+}
+
+function getMobileBoxPosition(
+  position: ConsentBannerConfig["position"],
+): string {
+  switch (position) {
+    case "top":
+    case "top_left":
+    case "top_right":
+      return "max-md:top-4";
+    case "center":
+      return "max-md:top-1/2 max-md:-translate-y-1/2";
+    case "bottom":
+    case "bottom_left":
+    case "bottom_right":
+    default:
+      return "max-md:bottom-4";
   }
 }
 
@@ -393,19 +425,19 @@ function getBoxPositionClasses(
 ): string {
   switch (position) {
     case "bottom_left":
-      return "bottom-4 left-4";
+      return "md:bottom-4 md:left-4";
     case "top_right":
-      return "top-4 right-4";
+      return "md:top-4 md:right-4";
     case "top_left":
-      return "top-4 left-4";
+      return "md:top-4 md:left-4";
     case "top":
-      return "top-4 left-1/2 -translate-x-1/2";
+      return "md:top-4 md:left-1/2 md:-translate-x-1/2";
     case "bottom":
-      return "bottom-4 left-1/2 -translate-x-1/2";
+      return "md:bottom-4 md:left-1/2 md:-translate-x-1/2";
     case "center":
-      return "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2";
+      return "md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2";
     case "bottom_right":
     default:
-      return "bottom-4 right-4";
+      return "md:bottom-4 md:right-4";
   }
 }

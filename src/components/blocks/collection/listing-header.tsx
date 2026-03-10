@@ -44,12 +44,9 @@ export function ListingHeaderBlock({
 
   if (!displayTitle) return null;
 
+  const alignClasses = { center: "text-center", right: "text-right" } as const;
   const alignClass =
-    textAlign === "center"
-      ? "text-center"
-      : textAlign === "right"
-        ? "text-right"
-        : "text-left";
+    alignClasses[textAlign as keyof typeof alignClasses] || "text-left";
 
   return (
     <header className={alignClass}>

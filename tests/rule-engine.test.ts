@@ -1,4 +1,4 @@
-import { CMSDataLayer } from "@/lib/analytics/data-layer";
+import { CMSDataLayer } from "@otl-core/analytics";
 import { setupEventRules } from "@/lib/analytics/rule-engine";
 import type { EventRule, ScriptContext } from "@otl-core/cms-types";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

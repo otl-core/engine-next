@@ -6,8 +6,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { CMSDataLayer } from "@/lib/analytics/data-layer";
-import type { DataLayerEntry } from "@/lib/analytics/data-layer";
+import { CMSDataLayer } from "@otl-core/analytics";
+import type { DataLayerEntry } from "@otl-core/analytics";
 
 // Since React hook testing requires a single React instance and the analytics
 // package has its own React dep, we test the underlying data layer logic

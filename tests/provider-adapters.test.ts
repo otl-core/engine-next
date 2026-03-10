@@ -3,7 +3,7 @@ import {
   createProviderAdapter,
   executeProviderCall,
 } from "@/lib/analytics/provider-adapters";
-import type { DataLayerEntry } from "@/lib/analytics/data-layer";
+import type { DataLayerEntry } from "@otl-core/analytics";
 import type {
   ConsentCategory,
   ManagedScript,

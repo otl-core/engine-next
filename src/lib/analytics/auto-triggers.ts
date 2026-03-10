@@ -7,7 +7,7 @@
  */
 
 import type { AutoEventSettings } from "@otl-core/cms-types";
-import type { CMSDataLayer } from "./data-layer";
+import type { CMSDataLayer } from "@otl-core/analytics";
 
 /**
  * Initialise all enabled auto-triggers and return a cleanup function.

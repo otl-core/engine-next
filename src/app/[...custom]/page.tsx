@@ -1,13 +1,10 @@
+import type React from "react";
 import CollectionLayoutRenderer from "@/components/collection/collection-layout-renderer";
 import { resolveShellContext } from "@/lib/route-context";
 import { sectionRegistry } from "@/lib/registries/section-registry";
 import {
   getABnBucket,
   hasValidPasswordCookie,
-  isMultivariateContent,
-  resolveEntryVariant,
-  resolveFormVariantsInSections,
-  resolvePageVariant,
   resolvePath,
   parsePageContent,
   parseEntryContent,
@@ -16,9 +13,13 @@ import {
 import { ABnVariantSetter } from "@otl-core/analytics";
 import type { SchemaInstance } from "@otl-core/cms-types";
 import {
-  isContentVisible,
-  isPasswordProtected,
   extractPaginationFromLayout,
+  isContentVisible,
+  isMultivariateContent,
+  isPasswordProtected,
+  resolveEntryVariant,
+  resolveFormVariantsInSections,
+  resolvePageVariant,
 } from "@otl-core/cms-utils";
 import {
   generatePageMetadata,
@@ -249,7 +250,7 @@ export default async function CustomRoute({
     }
 
     // Pagination prev/next links (React 19 auto-hoists <link> into <head>)
-    let paginationLinks: JSX.Element | null = null;
+    let paginationLinks: React.JSX.Element | null = null;
     if (
       (resolution.type === "collection" ||
         resolution.type === "category" ||
@@ -263,12 +264,13 @@ export default async function CustomRoute({
       const pagination = extractPaginationFromLayout(layout);
       if (pagination) {
         const baseUrl = `${shell.site.siteUrl}${fullPath}`;
-        const prevPage =
-          pagination.hasPrev && pagination.page > 1
-            ? pagination.page === 2
+        let prevPage: string | null = null;
+        if (pagination.hasPrev && pagination.page > 1) {
+          prevPage =
+            pagination.page === 2
               ? baseUrl
-              : `${baseUrl}?page=${pagination.page - 1}`
-            : null;
+              : `${baseUrl}?page=${pagination.page - 1}`;
+        }
         const nextPage = pagination.hasNext
           ? `${baseUrl}?page=${pagination.page + 1}`
           : null;
@@ -332,11 +334,12 @@ function injectEntryBlocksIntoLayout(
     const config = section.config;
     if (!config) return section;
 
-    const childrenKey = Array.isArray(config.children)
-      ? "children"
-      : Array.isArray(config.child)
-        ? "child"
-        : null;
+    let childrenKey: "children" | "child" | null = null;
+    if (Array.isArray(config.children)) {
+      childrenKey = "children";
+    } else if (Array.isArray(config.child)) {
+      childrenKey = "child";
+    }
 
     if (!childrenKey) return section;
 

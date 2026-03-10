@@ -1,14 +1,17 @@
 import type { Author, BlockComponentProps } from "@otl-core/cms-types";
 import Image from "next/image";
 
+interface AuthorInfoData extends Author {
+  current_locale?: string;
+}
+
 interface AuthorInfoConfig extends Record<string, unknown> {
   title?: string;
   showAvatar?: boolean;
   showBio?: boolean;
   showSocial?: boolean;
   showCustomFields?: boolean;
-  locale?: string;
-  data?: Author;
+  data?: AuthorInfoData;
 }
 
 interface AuthorInfoProps extends BlockComponentProps<AuthorInfoConfig> {
@@ -30,9 +33,10 @@ export function AuthorInfoBlock({ config }: AuthorInfoProps) {
     showBio = true,
     showSocial = true,
     showCustomFields = false,
-    locale = "en",
     data: author,
   } = config;
+
+  const locale = author?.current_locale || "en";
 
   if (!author) return null;
 

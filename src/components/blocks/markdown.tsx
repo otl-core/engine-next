@@ -4,7 +4,7 @@
  */
 
 import type { BlockComponentProps } from "@otl-core/cms-types";
-import { cn } from "@otl-core/cms-utils";
+import { cn } from "@otl-core/style-utils";
 import ReactMarkdown from "react-markdown";
 
 interface MarkdownContentConfig {

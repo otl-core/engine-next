@@ -24,9 +24,9 @@ interface AuthorListConfig extends Record<string, unknown> {
   showAvatar?: boolean;
   showBio?: boolean;
   showEntryCount?: boolean;
-  locale?: string;
   data?: {
     items: AuthorItem[];
+    current_locale?: string;
   };
 }
 
@@ -49,9 +49,10 @@ export function AuthorListBlock({ config }: AuthorListProps) {
     showAvatar = true,
     showBio = true,
     showEntryCount = false,
-    locale = "en",
     data,
   } = config;
+
+  const locale = data?.current_locale || "en";
 
   const authors = data?.items || [];
 

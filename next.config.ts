@@ -2,13 +2,20 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
+  reactCompiler: true,
   experimental: {
     authInterrupts: true,
   },
   turbopack: {
     root: path.resolve(__dirname, "../.."),
   },
-  transpilePackages: ["@otl-core/block-registry", "@otl-core/section-registry"],
+  transpilePackages: [
+    "@otl-core/block-registry",
+    "@otl-core/next-footer",
+    "@otl-core/next-navigation",
+    "@otl-core/section-registry",
+    "@otl-core/style-utils",
+  ],
   images: {
     remotePatterns: [
       {

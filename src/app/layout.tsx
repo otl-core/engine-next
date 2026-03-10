@@ -10,13 +10,19 @@ import { ConsentBanner } from "@/components/consent";
 import { ConfigurationError } from "@/components/feedback/configuration-error";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { FaviconTags } from "@/components/favicon/favicon-tags";
-import { Footer } from "@/components/footer";
-import { Header } from "@/components/navigation";
+import { Footer } from "@otl-core/next-footer";
+import { Header } from "@otl-core/next-navigation";
+import { blockRegistry } from "@/lib/registries/block-registry";
 import { SitePasswordGate } from "@/components/password/site-password-gate";
 import { AnalyticsEventManager, ScriptLoader } from "@/components/scripts";
 import { Style } from "@/components/style/style";
-import { ConsentProvider, injectGoogleConsentDefaults } from "@/lib/consent";
+import {
+  ConsentProvider,
+  injectGoogleConsentDefaults,
+  parseConsentCookie,
+} from "@/lib/consent";
 import { resolveShellContext } from "@/lib/route-context";
+import { cookies } from "next/headers";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
@@ -51,6 +57,12 @@ export default async function RootLayout({
   const consentBannerConfig = scriptsConfig?.consent_banner;
   const googleConsentEnabled =
     consentBannerConfig?.google_consent_mode_enabled ?? false;
+  const cookieName = consentBannerConfig?.cookie_name ?? "otl_consent";
+  const cookieStore = await cookies();
+  const consentCookie = cookieStore.get(cookieName)?.value;
+  const initialConsent = consentCookie
+    ? parseConsentCookie(consentCookie)
+    : null;
 
   const contentType = shell?.contentType ?? "pages";
 
@@ -87,7 +99,10 @@ export default async function RootLayout({
             scriptsConfig?.auto_events?.form_submissions ?? false
           }
         >
-          <ConsentProvider config={consentBannerConfig}>
+          <ConsentProvider
+            config={consentBannerConfig}
+            initialConsent={initialConsent}
+          >
             {shell ? (
               <>
                 <ScriptLoader
@@ -114,6 +129,7 @@ export default async function RootLayout({
                   <Footer
                     footer={shell.configs.footer}
                     site={shell.configs.site}
+                    blockRegistry={blockRegistry}
                   />
                 </SitePasswordGate>
                 <ConsentBanner

@@ -6,6 +6,9 @@
  * Client-side context that manages the user's cookie consent state.
  * Reads/writes the consent cookie and optionally fires Google Consent
  * Mode updates when preferences change.
+ *
+ * Exposes `window.__otlConsent` with `.reset()`, `.accept()`, `.reject()`,
+ * `.state()` for programmatic control and debugging.
  */
 
 import {
@@ -21,39 +24,21 @@ import type { ConsentCategory, ConsentBannerConfig } from "@otl-core/cms-types";
 import type { ConsentState, ConsentCookieData } from "./consent-cookie";
 import {
   getDefaultConsentState,
-  parseConsentCookie,
   serializeConsentCookie,
 } from "./consent-cookie";
 import { fireGoogleConsentUpdate } from "./google-consent-mode";
 
 export interface ConsentContextValue {
-  /** Current consent per category. */
   consentState: ConsentState;
-  /** Whether the user has made any consent decision (cookie exists). */
   hasConsented: boolean;
-  /** Update consent for a single category. */
   updateConsent(category: ConsentCategory, granted: boolean): void;
-  /** Accept all consent categories. */
   acceptAll(): void;
-  /** Reject all non-necessary categories. */
   rejectAll(): void;
-  /** Save a complete consent state. */
   savePreferences(state: ConsentState): void;
-  /** Reset consent (re-show banner). Used by the reopen trigger. */
   resetConsent(): void;
 }
 
 const ConsentContext = createContext<ConsentContextValue | null>(null);
-
-function getCookieValue(name: string): string | undefined {
-  if (typeof document === "undefined") return undefined;
-  const match = document.cookie.match(
-    new RegExp(
-      "(?:^|;\\s*)" + name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "=([^;]*)",
-    ),
-  );
-  return match ? decodeURIComponent(match[1]) : undefined;
-}
 
 function setCookie(name: string, value: string, maxAgeSeconds: number): void {
   if (typeof document === "undefined") return;
@@ -67,17 +52,29 @@ function deleteCookie(name: string): void {
 
 interface ConsentProviderProps {
   config: ConsentBannerConfig | undefined;
+  initialConsent: ConsentCookieData | null;
   children: React.ReactNode;
 }
 
-// Extend Navigator with GPC (not in standard TypeScript lib types)
 declare global {
   interface Navigator {
     globalPrivacyControl?: boolean;
   }
+  interface Window {
+    __otlConsent?: {
+      reset(): void;
+      accept(): void;
+      reject(): void;
+      state(): void;
+    };
+  }
 }
 
-export function ConsentProvider({ config, children }: ConsentProviderProps) {
+export function ConsentProvider({
+  config,
+  initialConsent,
+  children,
+}: ConsentProviderProps) {
   const cookieName = config?.cookie_name ?? "otl_consent";
   const consentMode = config?.consent_mode ?? "opt_in";
   const lifetimeSeconds = (config?.cookie_lifetime_days ?? 365) * 86400;
@@ -86,53 +83,33 @@ export function ConsentProvider({ config, children }: ConsentProviderProps) {
   const respectGpc = config?.respect_gpc ?? false;
   const reConsentDays = config?.re_consent_days ?? 0;
 
-  // Resolve initial consent from cookie / privacy signals (runs once on client)
-  const initRef = useRef(false);
+  const initialExpired =
+    initialConsent &&
+    reConsentDays > 0 &&
+    initialConsent.consented_at > 0 &&
+    Date.now() > initialConsent.consented_at + reConsentDays * 86400000;
+
   const [consentState, setConsentState] = useState<ConsentState>(() =>
-    getDefaultConsentState(consentMode),
+    initialConsent && !initialExpired
+      ? initialConsent.state
+      : getDefaultConsentState(consentMode),
   );
-  const [hasConsented, setHasConsented] = useState(false);
+  const [hasConsented, setHasConsented] = useState(
+    !!initialConsent && !initialExpired,
+  );
 
-  if (!initRef.current && typeof document !== "undefined") {
-    initRef.current = true;
-    const existingValue = getCookieValue(cookieName);
-
-    if (existingValue) {
-      const cookieData: ConsentCookieData = parseConsentCookie(existingValue);
-
-      // Check re-consent: if re_consent_days is configured and the cookie
-      // was written in the new format (consented_at > 0), check expiry.
-      let expired = false;
-      if (reConsentDays > 0 && cookieData.consented_at > 0) {
-        const expiryMs = cookieData.consented_at + reConsentDays * 86400000;
-        if (Date.now() > expiryMs) {
-          deleteCookie(cookieName);
-          expired = true;
-        }
-      }
-
-      if (!expired) {
-        setConsentState(cookieData.state);
-        setHasConsented(true);
-      }
-    }
-  }
-
-  // Handle privacy signals (DNT/GPC) that require writing cookies -- runs as effect
-  // because setCookie is a side-effect on an external system.
+  const initRef = useRef(false);
   useEffect(() => {
-    // Only act if user has not already consented (cookie was present)
+    if (initRef.current) return;
+    initRef.current = true;
+
+    if (initialExpired) {
+      deleteCookie(cookieName);
+    }
+
     if (hasConsented) return;
 
-    const existingValue = getCookieValue(cookieName);
-    if (existingValue) return;
-
-    // Check Do Not Track
-    if (
-      respectDnt &&
-      typeof navigator !== "undefined" &&
-      navigator.doNotTrack === "1"
-    ) {
+    if (respectDnt && navigator.doNotTrack === "1") {
       const dntState = getDefaultConsentState("opt_in");
       setCookie(cookieName, serializeConsentCookie(dntState), lifetimeSeconds);
       if (googleConsentEnabled) fireGoogleConsentUpdate(dntState);
@@ -141,25 +118,18 @@ export function ConsentProvider({ config, children }: ConsentProviderProps) {
       return;
     }
 
-    // Check Global Privacy Control
-    if (
-      respectGpc &&
-      typeof navigator !== "undefined" &&
-      navigator.globalPrivacyControl === true
-    ) {
+    if (respectGpc && navigator.globalPrivacyControl === true) {
       const gpcState = getDefaultConsentState("opt_in");
       setCookie(cookieName, serializeConsentCookie(gpcState), lifetimeSeconds);
       if (googleConsentEnabled) fireGoogleConsentUpdate(gpcState);
       setConsentState(gpcState);
       setHasConsented(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-time mount check
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-time mount init
   }, []);
 
-  // Persist consent and optionally fire Google Consent update
   const persistConsent = useCallback(
     (state: ConsentState) => {
-      // Ensure `necessary` is always true
       const normalized: ConsentState = { ...state, necessary: true };
       setConsentState(normalized);
       setHasConsented(true);
@@ -177,21 +147,20 @@ export function ConsentProvider({ config, children }: ConsentProviderProps) {
 
   const updateConsent = useCallback(
     (category: ConsentCategory, granted: boolean) => {
-      if (category === "necessary") return; // Cannot toggle off necessary
+      if (category === "necessary") return;
       persistConsent({ ...consentState, [category]: granted });
     },
     [consentState, persistConsent],
   );
 
   const acceptAll = useCallback(() => {
-    const allGranted: ConsentState = {
+    persistConsent({
       necessary: true,
       analytics: true,
       marketing: true,
       preferences: true,
       social: true,
-    };
-    persistConsent(allGranted);
+    });
   }, [persistConsent]);
 
   const rejectAll = useCallback(() => {
@@ -210,6 +179,26 @@ export function ConsentProvider({ config, children }: ConsentProviderProps) {
     setConsentState(getDefaultConsentState(consentMode));
     setHasConsented(false);
   }, [cookieName, consentMode]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.__otlConsent = {
+      reset: resetConsent,
+      accept: acceptAll,
+      reject: rejectAll,
+      state: () => consentState,
+    };
+    return () => {
+      delete window.__otlConsent;
+    };
+  }, [
+    resetConsent,
+    acceptAll,
+    rejectAll,
+    hasConsented,
+    consentState,
+    cookieName,
+  ]);
 
   const value = useMemo<ConsentContextValue>(
     () => ({
@@ -237,9 +226,6 @@ export function ConsentProvider({ config, children }: ConsentProviderProps) {
   );
 }
 
-/**
- * Access the consent context. Must be used within a `<ConsentProvider>`.
- */
 export function useConsent(): ConsentContextValue {
   const ctx = useContext(ConsentContext);
   if (!ctx) {
