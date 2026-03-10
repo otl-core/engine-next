@@ -84,22 +84,22 @@ jobs:
 
           git push origin "$BRANCH"
 
-          gh pr create \
-            --title "chore: sync OTL Engine to $LATEST" \
-            --body "$(cat <<'BODY'
-## OTL Engine Update
+          RELEASE_URL="https://github.com/otl-core/engine-next/releases/tag/$LATEST"
 
+          PR_BODY="## OTL Engine Update
 A new stable version of the OTL Engine is available.
 
-**What changed:** See the [release notes](https://github.com/otl-core/engine-next/releases/tag/${{ steps.check.outputs.latest }}).
+**What changed:** See the [release notes]($RELEASE_URL).
 
 **What to do:**
 - Review the changes below
 - Resolve any merge conflicts with your customizations
 - Merge this PR to update your engine
 
-This PR was created automatically by the OTL Engine sync workflow.
-BODY
-          )" \
+This PR was created automatically by the OTL Engine sync workflow."
+
+          gh pr create \
+            --title "chore: sync OTL Engine to $LATEST" \
+            --body "$PR_BODY" \
             --head "$BRANCH" \
             --base main
