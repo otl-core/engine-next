@@ -29,7 +29,7 @@ jobs:
           # Check if a sync PR or branch already exists for this version
           EXISTING_PR=$(gh pr list --repo "${{ github.repository }}" --head "sync/$LATEST" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
           if [ -n "$EXISTING_PR" ]; then
-            echo "PR #$EXISTING_PR already exists for $LATEST — skipping."
+            echo "PR #${EXISTING_PR} already exists for ${LATEST} - skipping."
             echo "has_update=false" >> $GITHUB_OUTPUT
             exit 0
           fi
@@ -54,7 +54,7 @@ jobs:
             echo "Already up to date at v$CURRENT."
             echo "needs_sync=false" >> $GITHUB_OUTPUT
           else
-            echo "Update available: v$CURRENT → $LATEST"
+            echo "Update available: v${CURRENT} -> ${LATEST}"
             echo "needs_sync=true" >> $GITHUB_OUTPUT
           fi
 
@@ -77,29 +77,17 @@ jobs:
           if git merge "$LATEST" --no-edit; then
             echo "Merged $LATEST cleanly."
           else
-            echo "Merge conflicts detected — committing with conflict markers for manual resolution."
+            echo "Merge conflicts detected - committing with conflict markers for manual resolution."
             git add -A
             git commit --no-edit -m "chore: sync engine $LATEST (conflicts need manual resolution)" || true
           fi
 
           git push origin "$BRANCH"
 
-          RELEASE_URL="https://github.com/otl-core/engine-next/releases/tag/$LATEST"
-
-          PR_BODY="## OTL Engine Update
-A new stable version of the OTL Engine is available.
-
-**What changed:** See the [release notes]($RELEASE_URL).
-
-**What to do:**
-- Review the changes below
-- Resolve any merge conflicts with your customizations
-- Merge this PR to update your engine
-
-This PR was created automatically by the OTL Engine sync workflow."
+          RELEASE_URL="https://github.com/otl-core/engine-next/releases/tag/${LATEST}"
 
           gh pr create \
-            --title "chore: sync OTL Engine to $LATEST" \
-            --body "$PR_BODY" \
-            --head "$BRANCH" \
+            --title "chore: sync OTL Engine to ${LATEST}" \
+            --body "New stable OTL Engine version available. See [release notes](${RELEASE_URL}). Review changes, resolve any conflicts, and merge to update." \
+            --head "${BRANCH}" \
             --base main
