@@ -4,7 +4,7 @@
  */
 
 import type { BlockComponentProps } from "@otl-core/cms-types";
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 
 interface EmbedConfig {
   embedCode?: string;
@@ -15,7 +15,7 @@ export function EmbedBlock({ config }: BlockComponentProps<EmbedConfig>) {
   const { embedCode = "", url = "" } = config;
 
   if (embedCode) {
-    const sanitizedCode = DOMPurify.sanitize(embedCode);
+    const sanitizedCode = sanitizeHtml(embedCode);
     return (
       <div
         className="my-4"

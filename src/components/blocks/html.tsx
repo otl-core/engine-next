@@ -4,7 +4,7 @@
  */
 
 import type { BlockComponentProps } from "@otl-core/cms-types";
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 
 interface HtmlContentConfig {
   content?: string;
@@ -17,7 +17,7 @@ export function HtmlBlock({ config }: BlockComponentProps<HtmlContentConfig>) {
     return null;
   }
 
-  const sanitizedHtml = DOMPurify.sanitize(content);
+  const sanitizedContent = sanitizeHtml(content);
 
-  return <div dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
+  return <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />;
 }

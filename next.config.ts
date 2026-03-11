@@ -3,7 +3,6 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
-  serverExternalPackages: ["jsdom"],
   experimental: {
     authInterrupts: true,
   },
