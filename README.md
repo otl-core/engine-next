@@ -15,9 +15,15 @@ npm run dev
 
 > **Why not fork?** GitHub requires forks of public repositories to be public. Since your site contains custom code and configuration, use the template button instead to keep your repository private.
 
-## Automatic Updates
+## Updating
 
-This repository includes a GitHub Action (`.github/workflows/sync-engine.yml`) that checks daily for new stable OTL Engine releases. When an update is available, it automatically creates a pull request in your repository so you can review and merge the changes.
+To update your engine to the latest stable version:
+
+```bash
+npx @otl-core/cli upgrade
+```
+
+This fetches the changes between your current version and the latest release, applies them as a patch, and preserves your customizations. Review the changes, resolve any conflicts, then commit.
 
 ## Documentation
 
