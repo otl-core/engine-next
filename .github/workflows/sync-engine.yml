@@ -74,7 +74,7 @@ jobs:
 
           git checkout -b "$BRANCH"
 
-          if git merge "$LATEST" --no-edit; then
+          if git merge "$LATEST" --no-edit --allow-unrelated-histories; then
             echo "Merged $LATEST cleanly."
           else
             echo "Merge conflicts detected - committing with conflict markers for manual resolution."
