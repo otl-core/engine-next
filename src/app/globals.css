@@ -1,8 +1,8 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-@source "../../../../packages/next-navigation/src/**/*.tsx";
-@source "../../../../packages/next-footer/src/**/*.tsx";
+@source "../../node_modules/@otl-core/next-navigation/dist/**/*.js";
+@source "../../node_modules/@otl-core/next-footer/dist/**/*.js";
 
 @custom-variant dark (&:is(.dark *));
 
