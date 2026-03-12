@@ -42,10 +42,10 @@ export async function POST(request: NextRequest) {
     const connector = getAPIClient();
     const siteId = connector.getSiteId();
 
-    const backendURL = process.env.API_URL;
+    const API_BASE_URL = process.env.API_URL?.replace(/\/+$/, "");
     const siteToken = process.env.SITE_ACCESS_TOKEN;
 
-    if (!backendURL) {
+    if (!API_BASE_URL) {
       return NextResponse.json(
         { success: false, error: "Backend URL not configured" },
         { status: 500 },
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     };
 
     const verifyResponse = await fetch(
-      `${backendURL}/api/v1/public/sites/${siteId}/verify-password`,
+      `${API_BASE_URL}/api/v1/public/sites/${siteId}/verify-password`,
       {
         method: "POST",
         headers: {

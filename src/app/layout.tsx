@@ -119,7 +119,11 @@ export default async function RootLayout({
                     locale: shell.locale ?? "en",
                   }}
                 />
-                <SitePasswordGate>
+                <SitePasswordGate
+                  passwordProtectionEnabled={
+                    shell.configs.website?.password_protection?.enabled === true
+                  }
+                >
                   <Header
                     navigation={shell.configs.header}
                     siteName={shell.site.siteName}
