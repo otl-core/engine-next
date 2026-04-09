@@ -40,8 +40,11 @@ export interface ShellContext {
  */
 export const resolveShellContext = cache(
   async (): Promise<ShellContext | null> => {
-    const defaultConfigs = await fetchConfigs();
-    if (!isValidSite(defaultConfigs)) return null;
+    // First fetch — no locale yet, we need the site config to know which
+    // locales exist and which one is the default before we can resolve the
+    // request locale from the URL.
+    const baseConfigs = await fetchConfigs();
+    if (!isValidSite(baseConfigs)) return null;
 
     // Read the pathname set by proxy.ts
     const headersList = await headers();
@@ -52,8 +55,18 @@ export const resolveShellContext = cache(
     const { locale, path } = resolveLocaleFromSegments(
       segments,
       pathname,
-      defaultConfigs.site,
+      baseConfigs.site,
     );
+
+    // Re-fetch with the resolved locale so locale-specific header/footer
+    // presets are returned. Skip the extra round trip when the resolved
+    // locale matches the site default — the first fetch already returned
+    // the correct config in that case.
+    const defaultConfigs =
+      locale && locale !== baseConfigs.site.default_locale
+        ? await fetchConfigs(locale)
+        : baseConfigs;
+    if (!isValidSite(defaultConfigs)) return null;
 
     // Resolve the path to check for header/footer presets and content type
     let configs = defaultConfigs;
