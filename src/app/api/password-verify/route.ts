@@ -74,7 +74,14 @@ export async function POST(request: NextRequest) {
     const verifyData =
       (await verifyResponse.json()) as PasswordVerifyBackendResponse;
 
-    if (verifyResponse.ok && verifyData.data?.valid && verifyData.data?.token) {
+    if (!verifyResponse.ok) {
+      return NextResponse.json(
+        { success: false, error: "Backend verification failed" },
+        { status: verifyResponse.status },
+      );
+    }
+
+    if (verifyData.data?.valid && verifyData.data?.token) {
       // Password is valid, set httpOnly cookie
       const response = NextResponse.json({
         success: true,
