@@ -121,6 +121,21 @@ export function Style({ theme, colors, fonts }: StyleProps) {
     .join("\n            ");
 
   // Generate @font-face rules for custom fonts
+  const fontFormatFromUrl = (url: string): string => {
+    const ext = url.split("?")[0].split("#")[0].split(".").pop()?.toLowerCase();
+    switch (ext) {
+      case "woff2":
+        return "woff2";
+      case "woff":
+        return "woff";
+      case "ttf":
+        return "truetype";
+      case "otf":
+        return "opentype";
+      default:
+        return "woff2";
+    }
+  };
   const fontFaces = (fonts?.fonts || [])
     .flatMap((font) => {
       if (!font.files) return [];
@@ -135,7 +150,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             font-weight: ${fontWeight};
             font-style: ${fontStyle};
             font-display: swap;
-            src: url('${url}') format('woff2');
+            src: url('${url}') format('${fontFormatFromUrl(url)}');
           }
         `;
       });
