@@ -120,9 +120,10 @@ export function Style({ theme, colors, fonts }: StyleProps) {
     )
     .join("\n            ");
 
-  // Generate @font-face rules for custom fonts
-  const fontFormatFromUrl = (url: string): string => {
-    const ext = url.split("?")[0].split("#")[0].split(".").pop()?.toLowerCase();
+  // Generate @font-face rules for custom fonts.
+  // File keys can be format-keyed ("700.woff2", "700.ttf") or legacy
+  // plain keys ("700"). Group by variant to emit multi-source src: lines.
+  const formatHintFromExt = (ext: string): string => {
     switch (ext) {
       case "woff2":
         return "woff2";
@@ -136,24 +137,55 @@ export function Style({ theme, colors, fonts }: StyleProps) {
         return "woff2";
     }
   };
+  const fontFormatFromUrl = (url: string): string => {
+    const ext = url.split("?")[0].split("#")[0].split(".").pop()?.toLowerCase();
+    return formatHintFromExt(ext ?? "woff2");
+  };
+  // Preferred format ordering for src: (browser picks the first it supports)
+  const FORMAT_PRIORITY: Record<string, number> = {
+    woff2: 0,
+    woff: 1,
+    ttf: 2,
+    otf: 3,
+  };
   const fontFaces = (fonts?.fonts || [])
     .flatMap((font) => {
       if (!font.files) return [];
       const stretch =
         font.stretch && font.stretch !== "normal" ? font.stretch : null;
+
+      // Group file entries by variant (e.g. "700", "700italic", "100-900").
+      // Keys can be "700.woff2" (format-keyed) or "700" (legacy).
+      const variantSources: Record<
+        string,
+        { url: string; format: string; ext: string }[]
+      > = {};
+      for (const [key, url] of Object.entries(font.files)) {
+        const dotIdx = key.lastIndexOf(".");
+        // Check if the part after the last dot is a known font extension
+        const possibleExt = dotIdx > 0 ? key.slice(dotIdx + 1) : "";
+        const isFormatKeyed = ["woff2", "woff", "ttf", "otf"].includes(
+          possibleExt,
+        );
+        const variant = isFormatKeyed ? key.slice(0, dotIdx) : key;
+        const ext = isFormatKeyed ? possibleExt : "";
+        const format = ext ? formatHintFromExt(ext) : fontFormatFromUrl(url);
+        if (!variantSources[variant]) variantSources[variant] = [];
+        variantSources[variant].push({ url, format, ext: ext || "woff2" });
+      }
+
       // Dedupe: variable fonts with an ital axis register both "100-900"
       // and "100-900italic" pointing at the same URL. We only need one
       // @font-face per unique URL + weight combination.
       const seen = new Set<string>();
-      return Object.entries(font.files).flatMap(([variant, url]) => {
+      return Object.entries(variantSources).flatMap(([variant, sources]) => {
         const isItalic = variant.endsWith("italic");
         const weightPart = isItalic
           ? variant.slice(0, -"italic".length)
           : variant;
-        // Weight can be a single value ("400") or a range ("100-900").
         const fontWeight = weightPart || "400";
         const fontStyle = isItalic ? "italic" : "normal";
-        const dedupeKey = `${url}|${fontWeight}|${fontStyle}`;
+        const dedupeKey = `${fontWeight}|${fontStyle}`;
         if (seen.has(dedupeKey)) return [];
         seen.add(dedupeKey);
         // Variable range format: "100-900" → "100 900" for CSS.
@@ -163,6 +195,14 @@ export function Style({ theme, colors, fonts }: StyleProps) {
         const stretchRule = stretch
           ? `\n            font-stretch: ${stretch};`
           : "";
+        // Sort sources by format priority (woff2 first)
+        const sorted = [...sources].sort(
+          (a, b) =>
+            (FORMAT_PRIORITY[a.ext] ?? 9) - (FORMAT_PRIORITY[b.ext] ?? 9),
+        );
+        const srcList = sorted
+          .map((s) => `url('${s.url}') format('${s.format}')`)
+          .join(",\n                 ");
         return [
           `
           @font-face {
@@ -170,7 +210,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             font-weight: ${cssWeight};
             font-style: ${fontStyle};${stretchRule}
             font-display: swap;
-            src: url('${url}') format('${fontFormatFromUrl(url)}');
+            src: ${srcList};
           }
         `,
         ];
