@@ -139,20 +139,41 @@ export function Style({ theme, colors, fonts }: StyleProps) {
   const fontFaces = (fonts?.fonts || [])
     .flatMap((font) => {
       if (!font.files) return [];
-      return Object.entries(font.files).map(([variant, url]) => {
-        const fontWeight = variant.replace(/italic/i, "").trim() || "400";
-        const fontStyle = variant.toLowerCase().includes("italic")
-          ? "italic"
-          : "normal";
-        return `
+      const stretch =
+        font.stretch && font.stretch !== "normal" ? font.stretch : null;
+      // Dedupe: variable fonts with an ital axis register both "100-900"
+      // and "100-900italic" pointing at the same URL. We only need one
+      // @font-face per unique URL + weight combination.
+      const seen = new Set<string>();
+      return Object.entries(font.files).flatMap(([variant, url]) => {
+        const isItalic = variant.endsWith("italic");
+        const weightPart = isItalic
+          ? variant.slice(0, -"italic".length)
+          : variant;
+        // Weight can be a single value ("400") or a range ("100-900").
+        const fontWeight = weightPart || "400";
+        const fontStyle = isItalic ? "italic" : "normal";
+        const dedupeKey = `${url}|${fontWeight}|${fontStyle}`;
+        if (seen.has(dedupeKey)) return [];
+        seen.add(dedupeKey);
+        // Variable range format: "100-900" → "100 900" for CSS.
+        const cssWeight = fontWeight.includes("-")
+          ? fontWeight.replace("-", " ")
+          : fontWeight;
+        const stretchRule = stretch
+          ? `\n            font-stretch: ${stretch};`
+          : "";
+        return [
+          `
           @font-face {
             font-family: '${font.family}';
-            font-weight: ${fontWeight};
-            font-style: ${fontStyle};
+            font-weight: ${cssWeight};
+            font-style: ${fontStyle};${stretchRule}
             font-display: swap;
             src: url('${url}') format('${fontFormatFromUrl(url)}');
           }
-        `;
+        `,
+        ];
       });
     })
     .join("\n");
