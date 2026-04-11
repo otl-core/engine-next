@@ -66,7 +66,7 @@ export default function PasswordPrompt({
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface px-4">
-      <div className="max-w-md w-full bg-card p-8 rounded-lg shadow-lg border border-border">
+      <div className="max-w-md w-full bg-card text-card-foreground p-8 rounded-lg shadow-lg border border-border">
         <div className="mb-6">
           <h1 className="text-xl font-bold text-foreground mb-2">
             {title || t.default_title || "Protected Content"}

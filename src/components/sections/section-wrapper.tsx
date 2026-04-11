@@ -92,7 +92,7 @@ function generateSpacingCSS(
 }
 
 export default function SectionWrapper({
-  container = "edged",
+  container,
   padding,
   margin,
   color,
@@ -112,12 +112,6 @@ export default function SectionWrapper({
     ...(fgColor ? { color: fgColor } : {}),
   };
 
-  // Default padding when none specified
-  const normalizedPadding = normalizeResponsiveValue(padding);
-  const normalizedMargin = normalizeResponsiveValue(margin);
-  const defaultPadding =
-    !normalizedPadding.base && !normalizedMargin.base ? "py-8" : "";
-
   if (container === "boxed") {
     return (
       <section
@@ -129,9 +123,7 @@ export default function SectionWrapper({
         {spacingCSS && (
           <style dangerouslySetInnerHTML={{ __html: spacingCSS }} />
         )}
-        <div id={innerId} className={defaultPadding}>
-          {children}
-        </div>
+        <div id={innerId}>{children}</div>
       </section>
     );
   }
@@ -148,15 +140,13 @@ export default function SectionWrapper({
           <style dangerouslySetInnerHTML={{ __html: spacingCSS }} />
         )}
         <div className="container mx-auto">
-          <div id={innerId} className={defaultPadding}>
-            {children}
-          </div>
+          <div id={innerId}>{children}</div>
         </div>
       </section>
     );
   }
 
-  // container === "ignore"
+  // No container — render as-is
   return (
     <section
       id={sectionId}
@@ -165,9 +155,7 @@ export default function SectionWrapper({
       style={sectionStyle}
     >
       {spacingCSS && <style dangerouslySetInnerHTML={{ __html: spacingCSS }} />}
-      <div id={innerId} className={defaultPadding}>
-        {children}
-      </div>
+      <div id={innerId}>{children}</div>
     </section>
   );
 }
