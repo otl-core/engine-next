@@ -2,16 +2,24 @@ import type { Components } from "react-markdown";
 
 /**
  * Converts single newlines to markdown hard breaks (two trailing spaces + newline)
- * while preserving double newlines as paragraph breaks.
+ * while preserving double newlines as paragraph breaks. Runs of 3+ newlines produce
+ * extra `&nbsp;` paragraphs so users can add visible vertical spacing.
  *
  * Standard markdown ignores single \n (soft break). CMS content authored in
  * textareas expects Enter → visible line break, so we normalise here.
  */
 export function normalizeNewlines(content: string): string {
-  return content
-    .replace(/\n\n/g, "\0PARA\0")
-    .replace(/\n/g, "  \n")
-    .replace(/\0PARA\0/g, "\n\n");
+  return (
+    content
+      // Runs of 3+ newlines: keep one paragraph break, emit empty paragraphs for extras
+      .replace(/\n{3,}/g, (match) => {
+        const extra = match.length - 2;
+        return "\n\n" + "&nbsp;\n\n".repeat(extra);
+      })
+      .replace(/\n\n/g, "\0PARA\0")
+      .replace(/\n/g, "  \n")
+      .replace(/\0PARA\0/g, "\n\n")
+  );
 }
 
 /**
