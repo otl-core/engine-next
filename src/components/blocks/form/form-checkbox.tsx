@@ -1,6 +1,7 @@
 "use client";
 
 import { useFormField } from "@otl-core/forms";
+import { normalizeNewlines } from "@/lib/markdown";
 import { useCallback, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 
@@ -53,7 +54,7 @@ export const FormCheckboxBlock = ({ blockId }: { blockId: string }) => {
           <div className="flex-1">
             <label
               htmlFor={inputId}
-              className="text-sm font-medium prose prose-sm max-w-none cursor-pointer"
+              className="text-sm font-medium max-w-none cursor-pointer"
             >
               <ReactMarkdown
                 components={{
@@ -71,7 +72,7 @@ export const FormCheckboxBlock = ({ blockId }: { blockId: string }) => {
                   ),
                 }}
               >
-                {field.label}
+                {normalizeNewlines(field.label)}
               </ReactMarkdown>
             </label>
           </div>
@@ -111,7 +112,7 @@ export const FormCheckboxBlock = ({ blockId }: { blockId: string }) => {
               />
               <label
                 htmlFor={inputId}
-                className="text-sm prose prose-sm max-w-none flex-1 cursor-pointer"
+                className="text-sm max-w-none flex-1 cursor-pointer"
               >
                 <ReactMarkdown
                   components={{
@@ -129,7 +130,7 @@ export const FormCheckboxBlock = ({ blockId }: { blockId: string }) => {
                     ),
                   }}
                 >
-                  {opt.label}
+                  {normalizeNewlines(opt.label)}
                 </ReactMarkdown>
               </label>
             </div>

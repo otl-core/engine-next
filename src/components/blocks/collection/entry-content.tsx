@@ -29,7 +29,7 @@ export function EntryContentBlock({
   if (!blocks || blocks.length === 0) return null;
 
   return (
-    <div className="entry-content prose prose-lg max-w-none dark:prose-invert">
+    <div className="entry-content max-w-none">
       {blocks.map((block) => (
         <BlockRenderer
           key={block.id}

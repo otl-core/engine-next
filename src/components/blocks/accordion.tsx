@@ -4,6 +4,7 @@
  */
 
 import type { BlockComponentProps } from "@otl-core/cms-types";
+import { markdownComponents, normalizeNewlines } from "@/lib/markdown";
 import ReactMarkdown from "react-markdown";
 import AccordionItemClient from "./client/accordion-item-client";
 
@@ -35,8 +36,10 @@ export function AccordionBlock({
           title={item.title}
           allowMultiple={allowMultiple}
         >
-          <div className="prose prose-sm max-w-none">
-            <ReactMarkdown>{item.content}</ReactMarkdown>
+          <div className="max-w-none">
+            <ReactMarkdown components={markdownComponents}>
+              {normalizeNewlines(item.content)}
+            </ReactMarkdown>
           </div>
         </AccordionItemClient>
       ))}

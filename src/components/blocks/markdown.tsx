@@ -5,6 +5,7 @@
 
 import type { BlockComponentProps } from "@otl-core/cms-types";
 import { cn } from "@otl-core/style-utils";
+import { markdownComponents, normalizeNewlines } from "@/lib/markdown";
 import ReactMarkdown from "react-markdown";
 
 interface MarkdownContentConfig {
@@ -29,8 +30,10 @@ export function MarkdownBlock({
   }[textAlign];
 
   return (
-    <div className={cn("prose prose-lg max-w-none", alignmentClass)}>
-      <ReactMarkdown>{content}</ReactMarkdown>
+    <div className={cn("max-w-none", alignmentClass)}>
+      <ReactMarkdown components={markdownComponents}>
+        {normalizeNewlines(content)}
+      </ReactMarkdown>
     </div>
   );
 }

@@ -1,7 +1,9 @@
 import {
   ColorConfig,
   ColorReference,
+  FontAssignment,
   FontConfig,
+  LinkTypography,
   ResponsiveValue,
   ThemeColor,
   ThemeConfig,
@@ -233,7 +235,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
   const typography = theme.typography || {};
   const typographyVars = Object.entries(typography)
     .map(([element, assignment]) => {
-      if (!assignment) return "";
+      if (!assignment || element === "link") return "";
       const font = fonts?.fonts.find((f) => f.id === assignment.fontId);
       const fontFamily = getFontFamilyString(assignment.fontId, font);
 
@@ -310,6 +312,62 @@ export function Style({ theme, colors, fonts }: StyleProps) {
       return css;
     })
     .join("\n");
+
+  // Generate typography color variables (mode-dependent, need light/dark variants)
+  const generateTypographyColorVars = (mode: "light" | "dark") => {
+    const slots = mode === "light" ? theme.light : theme.dark;
+    const vars: string[] = [];
+
+    for (const [element, assignment] of Object.entries(typography)) {
+      if (!assignment || element === "link") continue;
+      const fa = assignment as FontAssignment;
+      if (fa.color) {
+        const resolved = resolveColorReference(
+          fa.color,
+          colorLibrary,
+          mode,
+          slots,
+        );
+        vars.push(`--typography-${element}-color: ${resolved};`);
+      }
+    }
+
+    // Link typography
+    const link = typography.link as LinkTypography | undefined;
+    if (link) {
+      if (link.color) {
+        vars.push(
+          `--typography-link-color: ${resolveColorReference(link.color, colorLibrary, mode, slots)};`,
+        );
+      }
+      if (link.hoverColor) {
+        vars.push(
+          `--typography-link-hover-color: ${resolveColorReference(link.hoverColor, colorLibrary, mode, slots)};`,
+        );
+      }
+    }
+
+    return vars.map((v) => `            ${v}`).join("\n");
+  };
+
+  const typographyColorVarsLight = generateTypographyColorVars("light");
+  const typographyColorVarsDark = generateTypographyColorVars("dark");
+
+  // Generate link typography non-color variables
+  const linkTypographyVars = (() => {
+    const link = typography.link as LinkTypography | undefined;
+    if (!link) return "";
+    const vars: string[] = [];
+    if (link.textDecoration)
+      vars.push(`--typography-link-text-decoration: ${link.textDecoration};`);
+    if (link.hoverTextDecoration)
+      vars.push(
+        `--typography-link-hover-text-decoration: ${link.hoverTextDecoration};`,
+      );
+    if (link.fontWeight)
+      vars.push(`--typography-link-font-weight: ${link.fontWeight};`);
+    return vars.map((v) => `      ${v}`).join("\n");
+  })();
 
   // Resolve theme slots to actual color values
   const lightSlots = theme.light;
@@ -469,6 +527,10 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             
             /* Typography variables */
             ${typographyVars}
+            ${linkTypographyVars}
+
+            /* Typography colors (light mode) */
+            ${typographyColorVarsLight}
         }
         
         /* Apply typography to HTML elements and classes */
@@ -481,8 +543,9 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             letter-spacing: var(--typography-h1-letter-spacing);
             text-transform: var(--typography-h1-text-transform);
             text-decoration: var(--typography-h1-text-decoration);
+            color: var(--typography-h1-color, inherit);
         }
-        
+
         h2, .h2 {
             font-family: var(--typography-h2-font-family);
             font-weight: var(--typography-h2-font-weight);
@@ -492,8 +555,9 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             letter-spacing: var(--typography-h2-letter-spacing);
             text-transform: var(--typography-h2-text-transform);
             text-decoration: var(--typography-h2-text-decoration);
+            color: var(--typography-h2-color, inherit);
         }
-        
+
         h3, .h3 {
             font-family: var(--typography-h3-font-family);
             font-weight: var(--typography-h3-font-weight);
@@ -503,8 +567,9 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             letter-spacing: var(--typography-h3-letter-spacing);
             text-transform: var(--typography-h3-text-transform);
             text-decoration: var(--typography-h3-text-decoration);
+            color: var(--typography-h3-color, inherit);
         }
-        
+
         h4, .h4 {
             font-family: var(--typography-h4-font-family);
             font-weight: var(--typography-h4-font-weight);
@@ -514,8 +579,9 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             letter-spacing: var(--typography-h4-letter-spacing);
             text-transform: var(--typography-h4-text-transform);
             text-decoration: var(--typography-h4-text-decoration);
+            color: var(--typography-h4-color, inherit);
         }
-        
+
         h5, .h5 {
             font-family: var(--typography-h5-font-family);
             font-weight: var(--typography-h5-font-weight);
@@ -525,8 +591,9 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             letter-spacing: var(--typography-h5-letter-spacing);
             text-transform: var(--typography-h5-text-transform);
             text-decoration: var(--typography-h5-text-decoration);
+            color: var(--typography-h5-color, inherit);
         }
-        
+
         h6, .h6 {
             font-family: var(--typography-h6-font-family);
             font-weight: var(--typography-h6-font-weight);
@@ -536,8 +603,9 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             letter-spacing: var(--typography-h6-letter-spacing);
             text-transform: var(--typography-h6-text-transform);
             text-decoration: var(--typography-h6-text-decoration);
+            color: var(--typography-h6-color, inherit);
         }
-        
+
         p, .paragraph {
             font-family: var(--typography-paragraph-font-family);
             font-weight: var(--typography-paragraph-font-weight);
@@ -547,8 +615,9 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             letter-spacing: var(--typography-paragraph-letter-spacing);
             text-transform: var(--typography-paragraph-text-transform);
             text-decoration: var(--typography-paragraph-text-decoration);
+            color: var(--typography-paragraph-color, inherit);
         }
-        
+
         blockquote, .blockquote {
             font-family: var(--typography-blockquote-font-family);
             font-weight: var(--typography-blockquote-font-weight);
@@ -558,8 +627,9 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             letter-spacing: var(--typography-blockquote-letter-spacing);
             text-transform: var(--typography-blockquote-text-transform);
             text-decoration: var(--typography-blockquote-text-decoration);
+            color: var(--typography-blockquote-color, inherit);
         }
-        
+
         code, pre, .code {
             font-family: var(--typography-code-font-family);
             font-weight: var(--typography-code-font-weight);
@@ -569,8 +639,9 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             letter-spacing: var(--typography-code-letter-spacing);
             text-transform: var(--typography-code-text-transform);
             text-decoration: var(--typography-code-text-decoration);
+            color: var(--typography-code-color, inherit);
         }
-        
+
         small, .small {
             font-family: var(--typography-small-font-family);
             font-weight: var(--typography-small-font-weight);
@@ -580,6 +651,62 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             letter-spacing: var(--typography-small-letter-spacing);
             text-transform: var(--typography-small-text-transform);
             text-decoration: var(--typography-small-text-decoration);
+            color: var(--typography-small-color, inherit);
+        }
+
+        /* Link typography */
+        a, .a {
+            color: var(--typography-link-color, inherit);
+            text-decoration: var(--typography-link-text-decoration, underline);
+            font-weight: var(--typography-link-font-weight, inherit);
+        }
+        a:hover, .a:hover {
+            color: var(--typography-link-hover-color, var(--typography-link-color, inherit));
+            text-decoration: var(--typography-link-hover-text-decoration, var(--typography-link-text-decoration, underline));
+        }
+
+        /* List typography */
+        ul, .ul {
+            list-style-type: var(--typography-ul-list-style, disc);
+            padding-left: var(--typography-ul-padding-left, 1.5em);
+            margin-bottom: var(--typography-ul-margin-bottom, 1em);
+            color: var(--typography-ul-color, inherit);
+        }
+        ol, .ol {
+            list-style-type: var(--typography-ol-list-style, decimal);
+            padding-left: var(--typography-ol-padding-left, 1.5em);
+            margin-bottom: var(--typography-ol-margin-bottom, 1em);
+            color: var(--typography-ol-color, inherit);
+        }
+        li, .li {
+            margin-bottom: var(--typography-li-margin-bottom, 0.25em);
+            color: var(--typography-li-color, inherit);
+        }
+
+        /* Horizontal rule */
+        hr, .hr {
+            border: none;
+            border-top: var(--typography-hr-border-width, 1px) var(--typography-hr-border-style, solid) var(--typography-hr-color, currentColor);
+            margin-block: var(--typography-hr-margin-block, 1.5em);
+            opacity: var(--typography-hr-opacity, 0.2);
+        }
+
+        /* Table typography */
+        table, .table {
+            width: var(--typography-table-width, 100%);
+            border-collapse: collapse;
+            margin-bottom: var(--typography-table-margin-bottom, 1em);
+            color: var(--typography-table-color, inherit);
+        }
+        th, .th {
+            text-align: var(--typography-th-text-align, left);
+            font-weight: var(--typography-th-font-weight, 600);
+            padding: var(--typography-th-padding, 0.5em 0.75em);
+            border-bottom: var(--typography-th-border-width, 2px) solid var(--typography-th-border-color, currentColor);
+        }
+        td, .td {
+            padding: var(--typography-td-padding, 0.5em 0.75em);
+            border-bottom: var(--typography-td-border-width, 1px) solid var(--typography-td-border-color, currentColor);
         }
         
         /* Typography overrides for text modifiers */
@@ -874,7 +1001,10 @@ export function Style({ theme, colors, fonts }: StyleProps) {
                 --card-foreground: ${getForeground(darkSlots.card, "dark")};
                 --destructive: ${resolvedDark.destructive};
                 --destructive-foreground: ${getForeground(darkSlots.destructive, "dark")};
-                
+
+                /* Typography colors (dark mode) */
+                ${typographyColorVarsDark}
+
             }
         }
 
@@ -898,6 +1028,9 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             --card-foreground: ${getForeground(darkSlots.card, "dark")};
             --destructive: ${resolvedDark.destructive};
             --destructive-foreground: ${getForeground(darkSlots.destructive, "dark")};
+
+            /* Typography colors (dark mode) */
+            ${typographyColorVarsDark}
 
         }
 
