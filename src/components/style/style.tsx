@@ -569,8 +569,8 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             ${typographyColorVarsLight}
         }
         
-        /* Apply typography to HTML elements and classes */
-        h1, .h1 {
+        /* Apply typography to classes */
+        .h1 {
             font-family: var(--typography-h1-font-family);
             font-weight: var(--typography-h1-font-weight);
             font-style: var(--typography-h1-font-style);
@@ -582,7 +582,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             color: var(--typography-h1-color, inherit);
         }
 
-        h2, .h2 {
+        .h2 {
             font-family: var(--typography-h2-font-family);
             font-weight: var(--typography-h2-font-weight);
             font-style: var(--typography-h2-font-style);
@@ -594,7 +594,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             color: var(--typography-h2-color, inherit);
         }
 
-        h3, .h3 {
+        .h3 {
             font-family: var(--typography-h3-font-family);
             font-weight: var(--typography-h3-font-weight);
             font-style: var(--typography-h3-font-style);
@@ -606,7 +606,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             color: var(--typography-h3-color, inherit);
         }
 
-        h4, .h4 {
+        .h4 {
             font-family: var(--typography-h4-font-family);
             font-weight: var(--typography-h4-font-weight);
             font-style: var(--typography-h4-font-style);
@@ -618,7 +618,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             color: var(--typography-h4-color, inherit);
         }
 
-        h5, .h5 {
+        .h5 {
             font-family: var(--typography-h5-font-family);
             font-weight: var(--typography-h5-font-weight);
             font-style: var(--typography-h5-font-style);
@@ -630,7 +630,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             color: var(--typography-h5-color, inherit);
         }
 
-        h6, .h6 {
+        .h6 {
             font-family: var(--typography-h6-font-family);
             font-weight: var(--typography-h6-font-weight);
             font-style: var(--typography-h6-font-style);
@@ -642,7 +642,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             color: var(--typography-h6-color, inherit);
         }
 
-        p, .paragraph {
+        .paragraph {
             font-family: var(--typography-paragraph-font-family);
             font-weight: var(--typography-paragraph-font-weight);
             font-style: var(--typography-paragraph-font-style);
@@ -654,7 +654,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             color: var(--typography-paragraph-color, inherit);
         }
 
-        blockquote, .blockquote {
+        .blockquote {
             font-family: var(--typography-blockquote-font-family);
             font-weight: var(--typography-blockquote-font-weight);
             font-style: var(--typography-blockquote-font-style);
@@ -666,7 +666,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             color: var(--typography-blockquote-color, inherit);
         }
 
-        code, pre, .code {
+        .code {
             font-family: var(--typography-code-font-family);
             font-weight: var(--typography-code-font-weight);
             font-style: var(--typography-code-font-style);
@@ -678,7 +678,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             color: var(--typography-code-color, inherit);
         }
 
-        small, .small {
+        .small {
             font-family: var(--typography-small-font-family);
             font-weight: var(--typography-small-font-weight);
             font-style: var(--typography-small-font-style);
@@ -691,36 +691,36 @@ export function Style({ theme, colors, fonts }: StyleProps) {
         }
 
         /* Link typography */
-        a, .a {
+        .a {
             color: var(--typography-link-color, inherit);
             text-decoration: var(--typography-link-text-decoration, none);
             font-weight: var(--typography-link-font-weight, inherit);
         }
-        a:hover, .a:hover {
+        .a:hover {
             color: var(--typography-link-hover-color, var(--typography-link-color, inherit));
             text-decoration: var(--typography-link-hover-text-decoration, var(--typography-link-text-decoration, none));
         }
 
         /* List typography */
-        ul, .ul {
+        .ul {
             list-style-type: var(--typography-ul-list-style, disc);
             padding-left: var(--typography-ul-padding-left, 1.5em);
             margin-bottom: var(--typography-ul-margin-bottom, 1em);
             color: var(--typography-ul-color, inherit);
         }
-        ol, .ol {
+        .ol {
             list-style-type: var(--typography-ol-list-style, decimal);
             padding-left: var(--typography-ol-padding-left, 1.5em);
             margin-bottom: var(--typography-ol-margin-bottom, 1em);
             color: var(--typography-ol-color, inherit);
         }
-        li, .li {
+        .li {
             margin-bottom: var(--typography-li-margin-bottom, 0.25em);
             color: var(--typography-li-color, inherit);
         }
 
         /* Horizontal rule */
-        hr, .hr {
+        .hr {
             border: none;
             border-top: var(--typography-hr-border-width, 1px) var(--typography-hr-border-style, solid) var(--typography-hr-color, currentColor);
             margin-block: var(--typography-hr-margin-block, 1.5em);
@@ -728,25 +728,25 @@ export function Style({ theme, colors, fonts }: StyleProps) {
         }
 
         /* Table typography */
-        table, .table {
+        .table {
             width: var(--typography-table-width, 100%);
             border-collapse: collapse;
             margin-bottom: var(--typography-table-margin-bottom, 1em);
             color: var(--typography-table-color, inherit);
         }
-        th, .th {
+        .th {
             text-align: var(--typography-th-text-align, left);
             font-weight: var(--typography-th-font-weight, 600);
             padding: var(--typography-th-padding, 0.5em 0.75em);
             border-bottom: var(--typography-th-border-width, 2px) solid var(--typography-th-border-color, currentColor);
         }
-        td, .td {
+        .td {
             padding: var(--typography-td-padding, 0.5em 0.75em);
             border-bottom: var(--typography-td-border-width, 1px) solid var(--typography-td-border-color, currentColor);
         }
         
         /* Typography overrides for text modifiers */
-        h1 strong, .h1 strong, h1 b, .h1 b {
+        .h1 strong, .h1 b {
             font-family: var(--typography-h1-strong-font-family, var(--typography-h1-font-family));
             font-weight: var(--typography-h1-strong-font-weight, var(--typography-h1-font-weight));
             font-style: var(--typography-h1-strong-font-style, normal);
@@ -756,7 +756,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h1-strong-text-decoration, none);
         }
         
-        h1 em, .h1 em, h1 i, .h1 i {
+        .h1 em, .h1 i {
             font-family: var(--typography-h1-emphasis-font-family, var(--typography-h1-font-family));
             font-weight: var(--typography-h1-emphasis-font-weight, var(--typography-h1-font-weight));
             font-style: var(--typography-h1-emphasis-font-style, italic);
@@ -766,7 +766,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h1-emphasis-text-decoration, none);
         }
         
-        h1 code, .h1 code {
+        .h1 code {
             font-family: var(--typography-h1-inlineCode-font-family, var(--typography-h1-font-family));
             font-weight: var(--typography-h1-inlineCode-font-weight, var(--typography-h1-font-weight));
             font-style: var(--typography-h1-inlineCode-font-style, normal);
@@ -776,7 +776,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h1-inlineCode-text-decoration, none);
         }
         
-        h2 strong, .h2 strong, h2 b, .h2 b {
+        .h2 strong, .h2 b {
             font-family: var(--typography-h2-strong-font-family, var(--typography-h2-font-family));
             font-weight: var(--typography-h2-strong-font-weight, var(--typography-h2-font-weight));
             font-style: var(--typography-h2-strong-font-style, normal);
@@ -786,7 +786,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h2-strong-text-decoration, none);
         }
         
-        h2 em, .h2 em, h2 i, .h2 i {
+        .h2 em, .h2 i {
             font-family: var(--typography-h2-emphasis-font-family, var(--typography-h2-font-family));
             font-weight: var(--typography-h2-emphasis-font-weight, var(--typography-h2-font-weight));
             font-style: var(--typography-h2-emphasis-font-style, italic);
@@ -796,7 +796,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h2-emphasis-text-decoration, none);
         }
         
-        h2 code, .h2 code {
+        .h2 code {
             font-family: var(--typography-h2-inlineCode-font-family, var(--typography-h2-font-family));
             font-weight: var(--typography-h2-inlineCode-font-weight, var(--typography-h2-font-weight));
             font-style: var(--typography-h2-inlineCode-font-style, normal);
@@ -806,7 +806,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h2-inlineCode-text-decoration, none);
         }
         
-        h3 strong, .h3 strong, h3 b, .h3 b {
+        .h3 strong, .h3 b {
             font-family: var(--typography-h3-strong-font-family, var(--typography-h3-font-family));
             font-weight: var(--typography-h3-strong-font-weight, var(--typography-h3-font-weight));
             font-style: var(--typography-h3-strong-font-style, normal);
@@ -816,7 +816,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h3-strong-text-decoration, none);
         }
         
-        h3 em, .h3 em, h3 i, .h3 i {
+        .h3 em, .h3 i {
             font-family: var(--typography-h3-emphasis-font-family, var(--typography-h3-font-family));
             font-weight: var(--typography-h3-emphasis-font-weight, var(--typography-h3-font-weight));
             font-style: var(--typography-h3-emphasis-font-style, italic);
@@ -826,7 +826,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h3-emphasis-text-decoration, none);
         }
         
-        h3 code, .h3 code {
+        .h3 code {
             font-family: var(--typography-h3-inlineCode-font-family, var(--typography-h3-font-family));
             font-weight: var(--typography-h3-inlineCode-font-weight, var(--typography-h3-font-weight));
             font-style: var(--typography-h3-inlineCode-font-style, normal);
@@ -836,7 +836,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h3-inlineCode-text-decoration, none);
         }
         
-        h4 strong, .h4 strong, h4 b, .h4 b {
+        .h4 strong, .h4 b {
             font-family: var(--typography-h4-strong-font-family, var(--typography-h4-font-family));
             font-weight: var(--typography-h4-strong-font-weight, var(--typography-h4-font-weight));
             font-style: var(--typography-h4-strong-font-style, normal);
@@ -846,7 +846,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h4-strong-text-decoration, none);
         }
         
-        h4 em, .h4 em, h4 i, .h4 i {
+        .h4 em, .h4 i {
             font-family: var(--typography-h4-emphasis-font-family, var(--typography-h4-font-family));
             font-weight: var(--typography-h4-emphasis-font-weight, var(--typography-h4-font-weight));
             font-style: var(--typography-h4-emphasis-font-style, italic);
@@ -856,7 +856,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h4-emphasis-text-decoration, none);
         }
         
-        h4 code, .h4 code {
+        .h4 code {
             font-family: var(--typography-h4-inlineCode-font-family, var(--typography-h4-font-family));
             font-weight: var(--typography-h4-inlineCode-font-weight, var(--typography-h4-font-weight));
             font-style: var(--typography-h4-inlineCode-font-style, normal);
@@ -866,7 +866,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h4-inlineCode-text-decoration, none);
         }
         
-        h5 strong, .h5 strong, h5 b, .h5 b {
+        .h5 strong, .h5 b {
             font-family: var(--typography-h5-strong-font-family, var(--typography-h5-font-family));
             font-weight: var(--typography-h5-strong-font-weight, var(--typography-h5-font-weight));
             font-style: var(--typography-h5-strong-font-style, normal);
@@ -876,7 +876,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h5-strong-text-decoration, none);
         }
         
-        h5 em, .h5 em, h5 i, .h5 i {
+        .h5 em, .h5 i {
             font-family: var(--typography-h5-emphasis-font-family, var(--typography-h5-font-family));
             font-weight: var(--typography-h5-emphasis-font-weight, var(--typography-h5-font-weight));
             font-style: var(--typography-h5-emphasis-font-style, italic);
@@ -886,7 +886,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h5-emphasis-text-decoration, none);
         }
         
-        h5 code, .h5 code {
+        .h5 code {
             font-family: var(--typography-h5-inlineCode-font-family, var(--typography-h5-font-family));
             font-weight: var(--typography-h5-inlineCode-font-weight, var(--typography-h5-font-weight));
             font-style: var(--typography-h5-inlineCode-font-style, normal);
@@ -896,7 +896,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h5-inlineCode-text-decoration, none);
         }
         
-        h6 strong, .h6 strong, h6 b, .h6 b {
+        .h6 strong, .h6 b {
             font-family: var(--typography-h6-strong-font-family, var(--typography-h6-font-family));
             font-weight: var(--typography-h6-strong-font-weight, var(--typography-h6-font-weight));
             font-style: var(--typography-h6-strong-font-style, normal);
@@ -906,7 +906,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h6-strong-text-decoration, none);
         }
         
-        h6 em, .h6 em, h6 i, .h6 i {
+        .h6 em, .h6 i {
             font-family: var(--typography-h6-emphasis-font-family, var(--typography-h6-font-family));
             font-weight: var(--typography-h6-emphasis-font-weight, var(--typography-h6-font-weight));
             font-style: var(--typography-h6-emphasis-font-style, italic);
@@ -916,7 +916,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h6-emphasis-text-decoration, none);
         }
         
-        h6 code, .h6 code {
+        .h6 code {
             font-family: var(--typography-h6-inlineCode-font-family, var(--typography-h6-font-family));
             font-weight: var(--typography-h6-inlineCode-font-weight, var(--typography-h6-font-weight));
             font-style: var(--typography-h6-inlineCode-font-style, normal);
@@ -926,7 +926,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-h6-inlineCode-text-decoration, none);
         }
         
-        p strong, .paragraph strong, p b, .paragraph b {
+        .paragraph strong, .paragraph b {
             font-family: var(--typography-paragraph-strong-font-family, var(--typography-paragraph-font-family));
             font-weight: var(--typography-paragraph-strong-font-weight, var(--typography-paragraph-font-weight));
             font-style: var(--typography-paragraph-strong-font-style, normal);
@@ -936,7 +936,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-paragraph-strong-text-decoration, none);
         }
         
-        p em, .paragraph em, p i, .paragraph i {
+        .paragraph em, .paragraph i {
             font-family: var(--typography-paragraph-emphasis-font-family, var(--typography-paragraph-font-family));
             font-weight: var(--typography-paragraph-emphasis-font-weight, var(--typography-paragraph-font-weight));
             font-style: var(--typography-paragraph-emphasis-font-style, italic);
@@ -946,7 +946,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-paragraph-emphasis-text-decoration, none);
         }
         
-        p code, .paragraph code {
+        .paragraph code {
             font-family: var(--typography-paragraph-inlineCode-font-family, var(--typography-paragraph-font-family));
             font-weight: var(--typography-paragraph-inlineCode-font-weight, var(--typography-paragraph-font-weight));
             font-style: var(--typography-paragraph-inlineCode-font-style, normal);
@@ -956,7 +956,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-paragraph-inlineCode-text-decoration, none);
         }
         
-        blockquote strong, .blockquote strong, blockquote b, .blockquote b {
+        .blockquote strong, .blockquote b {
             font-family: var(--typography-blockquote-strong-font-family, var(--typography-blockquote-font-family));
             font-weight: var(--typography-blockquote-strong-font-weight, var(--typography-blockquote-font-weight));
             font-style: var(--typography-blockquote-strong-font-style, normal);
@@ -966,7 +966,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-blockquote-strong-text-decoration, none);
         }
         
-        blockquote em, .blockquote em, blockquote i, .blockquote i {
+        .blockquote em, .blockquote i {
             font-family: var(--typography-blockquote-emphasis-font-family, var(--typography-blockquote-font-family));
             font-weight: var(--typography-blockquote-emphasis-font-weight, var(--typography-blockquote-font-weight));
             font-style: var(--typography-blockquote-emphasis-font-style, italic);
@@ -976,7 +976,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-blockquote-emphasis-text-decoration, none);
         }
         
-        blockquote code, .blockquote code {
+        .blockquote code {
             font-family: var(--typography-blockquote-inlineCode-font-family, var(--typography-blockquote-font-family));
             font-weight: var(--typography-blockquote-inlineCode-font-weight, var(--typography-blockquote-font-weight));
             font-style: var(--typography-blockquote-inlineCode-font-style, normal);
@@ -986,7 +986,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-blockquote-inlineCode-text-decoration, none);
         }
         
-        small strong, .small strong, small b, .small b {
+        .small strong, .small b {
             font-family: var(--typography-small-strong-font-family, var(--typography-small-font-family));
             font-weight: var(--typography-small-strong-font-weight, var(--typography-small-font-weight));
             font-style: var(--typography-small-strong-font-style, normal);
@@ -996,7 +996,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-small-strong-text-decoration, none);
         }
         
-        small em, .small em, small i, .small i {
+        .small em, .small i {
             font-family: var(--typography-small-emphasis-font-family, var(--typography-small-font-family));
             font-weight: var(--typography-small-emphasis-font-weight, var(--typography-small-font-weight));
             font-style: var(--typography-small-emphasis-font-style, italic);
@@ -1006,7 +1006,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             text-decoration: var(--typography-small-emphasis-text-decoration, none);
         }
         
-        small code, .small code {
+        .small code {
             font-family: var(--typography-small-inlineCode-font-family, var(--typography-small-font-family));
             font-weight: var(--typography-small-inlineCode-font-weight, var(--typography-small-font-weight));
             font-style: var(--typography-small-inlineCode-font-style, normal);
