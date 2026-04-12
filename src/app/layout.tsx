@@ -36,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: {
       default: shell.site.siteName,
-      template: `%s | ${shell.site.siteName}`,
+      template: `%s ${shell.site.titleSeparator} ${shell.site.siteName}`,
     },
     description: shell.site.siteDescription,
   };

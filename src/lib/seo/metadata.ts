@@ -95,9 +95,9 @@ export function generatePageMetadata(params: {
   fullPath: string;
 }): Metadata {
   const { seo, site } = params;
-  const title = seo?.title || params.contentTitle || site.siteName;
+  const title = seo?.title || params.contentTitle;
   const description = seo?.description || params.descriptionFallback;
-  const ogTitle = seo?.og_title || title;
+  const ogTitle = seo?.og_title || title || site.siteName;
   const ogDescription = seo?.og_description || description;
   const canonical = resolveCanonical(
     seo?.canonical,
@@ -143,9 +143,9 @@ export function generateEntryMetadata(params: {
   fullPath: string;
 }): Metadata {
   const { seo, site } = params;
-  const title = seo?.title || params.contentTitle || "Collection Post";
+  const title = seo?.title || params.contentTitle;
   const description = seo?.description || params.excerpt;
-  const ogTitle = seo?.og_title || title;
+  const ogTitle = seo?.og_title || title || site.siteName;
   const ogDescription = seo?.og_description || description;
   const image = seo?.og_image || params.featuredImage;
   const canonical = resolveCanonical(
