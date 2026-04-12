@@ -693,12 +693,12 @@ export function Style({ theme, colors, fonts }: StyleProps) {
         /* Link typography */
         a, .a {
             color: var(--typography-link-color, inherit);
-            text-decoration: var(--typography-link-text-decoration, underline);
+            text-decoration: var(--typography-link-text-decoration, none);
             font-weight: var(--typography-link-font-weight, inherit);
         }
         a:hover, .a:hover {
             color: var(--typography-link-hover-color, var(--typography-link-color, inherit));
-            text-decoration: var(--typography-link-hover-text-decoration, var(--typography-link-text-decoration, underline));
+            text-decoration: var(--typography-link-hover-text-decoration, var(--typography-link-text-decoration, none));
         }
 
         /* List typography */
