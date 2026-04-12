@@ -29,6 +29,10 @@
   --color-card-foreground: var(--card-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-warning: var(--warning, #f59e0b);
+  --color-warning-foreground: var(--warning-foreground, #451a03);
+  --color-success: var(--success, #22c55e);
+  --color-success-foreground: var(--success-foreground, #052e16);
   --color-background: var(--surface);
   --color-foreground: var(--surface-foreground);
   --font-sans: var(--font-geist-sans);

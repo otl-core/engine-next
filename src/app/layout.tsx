@@ -15,6 +15,7 @@ import { Header } from "@otl-core/next-navigation";
 import { blockRegistry } from "@/lib/registries/block-registry";
 import { SitePasswordGate } from "@/components/password/site-password-gate";
 import { AnalyticsEventManager, ScriptLoader } from "@/components/scripts";
+import { FontPreloadLinks } from "@/components/style/font-preload-links";
 import { Style } from "@/components/style/style";
 import {
   ConsentProvider,
@@ -69,6 +70,7 @@ export default async function RootLayout({
   return (
     <html lang={shell?.locale ?? "en"}>
       <head>
+        <FontPreloadLinks fonts={shell?.configs.fonts ?? null} />
         <FaviconTags config={shell?.configs.favicon ?? null} />
         <link
           rel="alternate"

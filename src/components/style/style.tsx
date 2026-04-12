@@ -211,7 +211,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             font-family: '${font.family}';
             font-weight: ${cssWeight};
             font-style: ${fontStyle};${stretchRule}
-            font-display: swap;
+            font-display: optional;
             src: ${srcList};
           }
         `,
@@ -437,6 +437,22 @@ export function Style({ theme, colors, fonts }: StyleProps) {
       "light",
       lightSlots,
     ),
+    warning: lightSlots.warning
+      ? resolveColorReference(
+          lightSlots.warning,
+          colorLibrary,
+          "light",
+          lightSlots,
+        )
+      : "#f59e0b",
+    success: lightSlots.success
+      ? resolveColorReference(
+          lightSlots.success,
+          colorLibrary,
+          "light",
+          lightSlots,
+        )
+      : "#22c55e",
   };
 
   const resolvedDark = {
@@ -488,6 +504,22 @@ export function Style({ theme, colors, fonts }: StyleProps) {
       "dark",
       darkSlots,
     ),
+    warning: darkSlots.warning
+      ? resolveColorReference(
+          darkSlots.warning,
+          colorLibrary,
+          "dark",
+          darkSlots,
+        )
+      : "#f59e0b",
+    success: darkSlots.success
+      ? resolveColorReference(
+          darkSlots.success,
+          colorLibrary,
+          "dark",
+          darkSlots,
+        )
+      : "#22c55e",
   };
 
   return (
@@ -524,7 +556,11 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             --card-foreground: ${getForeground(lightSlots.card, "light")};
             --destructive: ${resolvedLight.destructive};
             --destructive-foreground: ${getForeground(lightSlots.destructive, "light")};
-            
+            --warning: ${resolvedLight.warning};
+            --warning-foreground: ${lightSlots.warning ? getForeground(lightSlots.warning, "light") : "#451a03"};
+            --success: ${resolvedLight.success};
+            --success-foreground: ${lightSlots.success ? getForeground(lightSlots.success, "light") : "#052e16"};
+
             /* Typography variables */
             ${typographyVars}
             ${linkTypographyVars}
@@ -1001,6 +1037,10 @@ export function Style({ theme, colors, fonts }: StyleProps) {
                 --card-foreground: ${getForeground(darkSlots.card, "dark")};
                 --destructive: ${resolvedDark.destructive};
                 --destructive-foreground: ${getForeground(darkSlots.destructive, "dark")};
+                --warning: ${resolvedDark.warning};
+                --warning-foreground: ${darkSlots.warning ? getForeground(darkSlots.warning, "dark") : "#451a03"};
+                --success: ${resolvedDark.success};
+                --success-foreground: ${darkSlots.success ? getForeground(darkSlots.success, "dark") : "#052e16"};
 
                 /* Typography colors (dark mode) */
                 ${typographyColorVarsDark}
@@ -1028,6 +1068,10 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             --card-foreground: ${getForeground(darkSlots.card, "dark")};
             --destructive: ${resolvedDark.destructive};
             --destructive-foreground: ${getForeground(darkSlots.destructive, "dark")};
+            --warning: ${resolvedDark.warning};
+            --warning-foreground: ${darkSlots.warning ? getForeground(darkSlots.warning, "dark") : "#451a03"};
+            --success: ${resolvedDark.success};
+            --success-foreground: ${darkSlots.success ? getForeground(darkSlots.success, "dark") : "#052e16"};
 
             /* Typography colors (dark mode) */
             ${typographyColorVarsDark}
