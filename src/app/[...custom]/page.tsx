@@ -41,7 +41,7 @@ export async function generateMetadata({
   searchParams,
 }: CustomRouteProps): Promise<Metadata> {
   const shell = await resolveShellContext();
-  if (!shell) return { title: "Page" };
+  if (!shell) return { title: "Page Not Found" };
 
   const { custom } = await params;
   const search = await searchParams;
@@ -102,7 +102,23 @@ export async function generateMetadata({
     // Fallback metadata
   }
 
-  return { title: "Page" };
+  // Path didn't resolve — use the CMS /not-found page title if available
+  try {
+    const notFoundResolution = await resolvePath("/not-found", shell.locale);
+    if (notFoundResolution.type === "page" && notFoundResolution.content) {
+      const notFoundContent = parsePageContent(notFoundResolution.content);
+      return generatePageMetadata({
+        seo: notFoundContent?.seo,
+        contentTitle: notFoundContent?.title,
+        site: shell.site,
+        fullPath: "/not-found",
+      });
+    }
+  } catch {
+    // CMS not-found page not available
+  }
+
+  return { title: "Page Not Found" };
 }
 
 export default async function CustomRoute({

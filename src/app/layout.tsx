@@ -130,6 +130,7 @@ export default async function RootLayout({
                     navigation={shell.configs.header}
                     siteName={shell.site.siteName}
                     site={shell.configs.site}
+                    locale={shell.locale}
                   />
                   <main>{children}</main>
                   <Footer

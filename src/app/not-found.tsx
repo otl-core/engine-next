@@ -16,10 +16,24 @@ import { PageRenderer } from "@otl-core/section-registry";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Page Not Found",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const { locale } = await detectLocaleFromRequest();
+    const resolution = await resolvePath("/not-found", locale);
+    if (resolution.type === "page" && resolution.content) {
+      const content = parsePageContent(resolution.content);
+      if (content?.title) {
+        return {
+          title: content.title,
+          robots: { index: false, follow: false },
+        };
+      }
+    }
+  } catch {
+    // CMS not available
+  }
+  return { title: "Page Not Found", robots: { index: false, follow: false } };
+}
 
 export default async function NotFound() {
   let sections: SchemaInstance[] | null = null;
