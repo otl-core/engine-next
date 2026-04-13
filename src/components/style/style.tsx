@@ -211,7 +211,7 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             font-family: '${font.family}';
             font-weight: ${cssWeight};
             font-style: ${fontStyle};${stretchRule}
-            font-display: optional;
+            font-display: block;
             src: ${srcList};
           }
         `,
