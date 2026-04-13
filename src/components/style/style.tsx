@@ -569,7 +569,19 @@ export function Style({ theme, colors, fonts }: StyleProps) {
             ${typographyColorVarsLight}
         }
         
-        /* Apply typography to classes */
+        /* Base typography applied to body — sets the default font for everything.
+           Per-element classes (.h1, .paragraph, etc.) override these defaults. */
+        body {
+            font-family: var(--typography-base-font-family, sans-serif);
+            font-weight: var(--typography-base-font-weight, 400);
+            font-style: var(--typography-base-font-style, normal);
+            font-size: var(--typography-base-font-size, 1rem);
+            line-height: var(--typography-base-line-height, 1.5);
+            letter-spacing: var(--typography-base-letter-spacing, normal);
+            color: var(--typography-base-color, inherit);
+        }
+
+        /* Apply typography to classes — overrides base per element */
         .h1 {
             font-family: var(--typography-h1-font-family);
             font-weight: var(--typography-h1-font-weight);
