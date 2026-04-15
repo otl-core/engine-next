@@ -4,8 +4,7 @@
  */
 
 import type { BlockComponentProps } from "@otl-core/cms-types";
-import { markdownComponents, normalizeNewlines } from "@/lib/markdown";
-import ReactMarkdown from "react-markdown";
+import { Markdown } from "@/lib/markdown";
 import TabsClient from "./client/tabs-client";
 
 interface TabItem {
@@ -28,11 +27,9 @@ export function TabsBlock({ config }: BlockComponentProps<TabsConfig>) {
   const renderedTabs = tabs.map((tab, index) => ({
     label: tab.label,
     content: (
-      <div key={index} className="max-w-none">
-        <ReactMarkdown components={markdownComponents}>
-          {normalizeNewlines(tab.content)}
-        </ReactMarkdown>
-      </div>
+      <Markdown key={index} className="max-w-none">
+        {tab.content}
+      </Markdown>
     ),
   }));
 

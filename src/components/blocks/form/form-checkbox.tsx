@@ -1,9 +1,8 @@
 "use client";
 
 import { useFormField } from "@otl-core/forms";
-import { normalizeNewlines } from "@/lib/markdown";
+import { MarkdownInline } from "@/lib/markdown";
 import { useCallback, useMemo } from "react";
-import ReactMarkdown from "react-markdown";
 
 export const FormCheckboxBlock = ({ blockId }: { blockId: string }) => {
   const field = useFormField<boolean | string[]>(blockId);
@@ -56,24 +55,7 @@ export const FormCheckboxBlock = ({ blockId }: { blockId: string }) => {
               htmlFor={inputId}
               className="text-sm font-medium max-w-none cursor-pointer"
             >
-              <ReactMarkdown
-                components={{
-                  p: ({ children }) => <span>{children}</span>,
-                  a: ({ href, children }) => (
-                    <a
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {children}
-                    </a>
-                  ),
-                }}
-              >
-                {normalizeNewlines(field.label)}
-              </ReactMarkdown>
+              <MarkdownInline>{field.label}</MarkdownInline>
             </label>
           </div>
         </div>
@@ -114,24 +96,7 @@ export const FormCheckboxBlock = ({ blockId }: { blockId: string }) => {
                 htmlFor={inputId}
                 className="text-sm max-w-none flex-1 cursor-pointer"
               >
-                <ReactMarkdown
-                  components={{
-                    p: ({ children }) => <span>{children}</span>,
-                    a: ({ href, children }) => (
-                      <a
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {children}
-                      </a>
-                    ),
-                  }}
-                >
-                  {normalizeNewlines(opt.label)}
-                </ReactMarkdown>
+                <MarkdownInline>{opt.label}</MarkdownInline>
               </label>
             </div>
           );

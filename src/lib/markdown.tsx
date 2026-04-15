@@ -1,4 +1,5 @@
-import type { Components } from "react-markdown";
+import { Marked } from "marked";
+import type { CSSProperties } from "react";
 
 /**
  * Converts single newlines to markdown hard breaks (two trailing spaces + newline)
@@ -23,101 +24,175 @@ export function normalizeNewlines(content: string): string {
 }
 
 /**
- * ReactMarkdown component overrides that assign matching CSS classes
- * to each rendered element. This gives every element a class hook
- * (e.g. `<ul class="ul">`) that the typography system styles via
- * CSS variables, and that users can target in their globals.css.
+ * Pre-processes emphasis markers (**bold**, *italic*, ***bold+italic***)
+ * into raw HTML tags before the CommonMark parser sees them.
+ *
+ * CommonMark's delimiter-run rules reject closing `**` when preceded by
+ * punctuation and followed by a non-punctuation character (e.g.
+ * `**krippner:**digital`). By converting emphasis to HTML inline tags
+ * first, we bypass that limitation — marked passes inline HTML through
+ * unchanged.
+ *
+ * Inline code spans are protected so `**code**` inside backticks stays
+ * literal.
  */
-export const markdownComponents: Components = {
-  h1: ({ children, ...props }) => (
-    <h1 className="h1" {...props}>
-      {children}
-    </h1>
-  ),
-  h2: ({ children, ...props }) => (
-    <h2 className="h2" {...props}>
-      {children}
-    </h2>
-  ),
-  h3: ({ children, ...props }) => (
-    <h3 className="h3" {...props}>
-      {children}
-    </h3>
-  ),
-  h4: ({ children, ...props }) => (
-    <h4 className="h4" {...props}>
-      {children}
-    </h4>
-  ),
-  h5: ({ children, ...props }) => (
-    <h5 className="h5" {...props}>
-      {children}
-    </h5>
-  ),
-  h6: ({ children, ...props }) => (
-    <h6 className="h6" {...props}>
-      {children}
-    </h6>
-  ),
-  p: ({ children, ...props }) => (
-    <p className="paragraph" {...props}>
-      {children}
-    </p>
-  ),
-  blockquote: ({ children, ...props }) => (
-    <blockquote className="blockquote" {...props}>
-      {children}
-    </blockquote>
-  ),
-  a: ({ children, ...props }) => (
-    <a className="a" {...props}>
-      {children}
-    </a>
-  ),
-  ul: ({ children, ...props }) => (
-    <ul className="ul" {...props}>
-      {children}
-    </ul>
-  ),
-  ol: ({ children, ...props }) => (
-    <ol className="ol" {...props}>
-      {children}
-    </ol>
-  ),
-  li: ({ children, ...props }) => (
-    <li className="li" {...props}>
-      {children}
-    </li>
-  ),
-  hr: ({ ...props }) => <hr className="hr" {...props} />,
-  table: ({ children, ...props }) => (
-    <table className="table" {...props}>
-      {children}
-    </table>
-  ),
-  th: ({ children, ...props }) => (
-    <th className="th" {...props}>
-      {children}
-    </th>
-  ),
-  td: ({ children, ...props }) => (
-    <td className="td" {...props}>
-      {children}
-    </td>
-  ),
-  pre: ({ children, ...props }) => (
-    <pre className="code" {...props}>
-      {children}
-    </pre>
-  ),
-  code: ({ children, ...props }) => (
-    <code className="code" {...props}>
-      {children}
-    </code>
-  ),
-  small: ({ children, ...props }) => (
-    <small className="small" {...props}>
-      {children}
-    </small>
-  ),
-};
+function preprocessEmphasis(text: string): string {
+  // Protect inline code from emphasis processing
+  const codes: string[] = [];
+  let s = text.replace(/`[^`]+`/g, (m) => {
+    codes.push(m);
+    return `\x00C${codes.length - 1}\x00`;
+  });
+
+  // Bold+italic: ***...***
+  s = s.replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>");
+  // Bold: **...**
+  s = s.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  // Italic: *...* (not adjacent to other asterisks)
+  s = s.replace(/(?<![\\*])\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, "<em>$1</em>");
+
+  // Restore inline code
+  s = s.replace(/\x00C(\d+)\x00/g, (_, i) => codes[parseInt(i)]);
+  return s;
+}
+
+/**
+ * Shared Marked instance with a custom renderer that adds CSS class hooks
+ * to every element. This mirrors the class names the typography system
+ * uses for styling via CSS variables (e.g. `.h1`, `.paragraph`, `.ul`).
+ */
+const md = new Marked({
+  renderer: {
+    heading({ tokens, depth }) {
+      const text = this.parser.parseInline(tokens);
+      const tag = `h${depth}`;
+      return `<${tag} class="${tag}">${text}</${tag}>\n`;
+    },
+    paragraph({ tokens }) {
+      const text = this.parser.parseInline(tokens);
+      return `<p class="paragraph">${text}</p>\n`;
+    },
+    blockquote({ tokens }) {
+      const text = this.parser.parse(tokens);
+      return `<blockquote class="blockquote">${text}</blockquote>\n`;
+    },
+    link({ href, tokens }) {
+      const text = this.parser.parseInline(tokens);
+      return `<a class="a" href="${href}">${text}</a>`;
+    },
+    list({ ordered, items }) {
+      const tag = ordered ? "ol" : "ul";
+      let body = "";
+      for (const item of items) {
+        body += this.listitem(item);
+      }
+      return `<${tag} class="${tag}">${body}</${tag}>\n`;
+    },
+    listitem({ tokens }) {
+      let text = "";
+      for (const token of tokens) {
+        text += this.parser.parse([token]);
+      }
+      // Remove wrapping <p> from loose list items
+      text = text.replace(/^<p class="paragraph">(.*)<\/p>\n$/, "$1");
+      return `<li class="li">${text}</li>\n`;
+    },
+    hr() {
+      return `<hr class="hr" />\n`;
+    },
+    table({ header, rows }) {
+      let headerHtml = "<tr>";
+      for (const cell of header) {
+        headerHtml += `<th class="th">${this.parser.parseInline(cell.tokens)}</th>`;
+      }
+      headerHtml += "</tr>";
+      let bodyHtml = "";
+      for (const row of rows) {
+        bodyHtml += "<tr>";
+        for (const cell of row) {
+          bodyHtml += `<td class="td">${this.parser.parseInline(cell.tokens)}</td>`;
+        }
+        bodyHtml += "</tr>";
+      }
+      return `<table class="table"><thead>${headerHtml}</thead><tbody>${bodyHtml}</tbody></table>\n`;
+    },
+    code({ text, lang }) {
+      const langAttr = lang ? ` class="language-${lang}"` : "";
+      return `<pre class="code"><code${langAttr}>${text}</code></pre>\n`;
+    },
+    codespan({ text }) {
+      return `<code class="code">${text}</code>`;
+    },
+  },
+});
+
+/**
+ * Parse markdown content to an HTML string with CSS class hooks on
+ * every element, and robust emphasis handling for edge-cases the
+ * CommonMark spec drops (e.g. `**bold:**adjacent`).
+ */
+export function parseMarkdown(content: string): string {
+  const normalized = normalizeNewlines(content);
+  const preprocessed = preprocessEmphasis(normalized);
+  return md.parse(preprocessed, { async: false }) as string;
+}
+
+/**
+ * Parse inline markdown for contexts where block-level elements are
+ * unwanted (e.g. checkbox labels rendered inside a `<label>`).
+ * Returns HTML without wrapping `<p>` tags.
+ */
+export function parseMarkdownInline(content: string): string {
+  const normalized = normalizeNewlines(content);
+  const preprocessed = preprocessEmphasis(normalized);
+  return md.parseInline(preprocessed) as string;
+}
+
+/**
+ * Renders markdown content as HTML. Drop-in replacement for ReactMarkdown.
+ *
+ * Usage:
+ *   <Markdown>{"**bold** text"}</Markdown>
+ */
+export function Markdown({
+  children,
+  className,
+  style,
+}: {
+  children: string;
+  className?: string;
+  style?: CSSProperties;
+}) {
+  return (
+    <div
+      dangerouslySetInnerHTML={{ __html: parseMarkdown(children) }}
+      className={className}
+      style={style}
+    />
+  );
+}
+
+/**
+ * Inline variant — renders as `<span>` instead of `<div>`, suitable for
+ * use inside `<label>`, `<p>`, or other inline contexts.
+ *
+ * Usage:
+ *   <MarkdownInline>{"**bold** label"}</MarkdownInline>
+ */
+export function MarkdownInline({
+  children,
+  className,
+  style,
+}: {
+  children: string;
+  className?: string;
+  style?: CSSProperties;
+}) {
+  return (
+    <span
+      dangerouslySetInnerHTML={{ __html: parseMarkdownInline(children) }}
+      className={className}
+      style={style}
+    />
+  );
+}
