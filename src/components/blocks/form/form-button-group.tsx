@@ -16,14 +16,25 @@ function CheckIndicator({
     <span
       className={`inline-flex shrink-0 items-center justify-center h-4 w-4 rounded border text-[10px] leading-none transition-colors ${
         selected
-          ? "border-primary-foreground/50 bg-primary-foreground/20"
-          : "border-border bg-transparent"
+          ? "border-primary-foreground/50 bg-primary-foreground/20 text-primary-foreground"
+          : "border-current opacity-40"
       }`}
       aria-hidden="true"
     >
       {selected ? (type === "check" ? "✓" : "●") : ""}
     </span>
   );
+}
+
+function getContainerClassName(appearance: string | undefined): string {
+  switch (appearance) {
+    case "full":
+      return "flex flex-col gap-2";
+    case "grid-2":
+      return "grid grid-cols-2 gap-2";
+    default:
+      return "flex flex-wrap gap-2";
+  }
 }
 
 function getAlignClassName(align: string | undefined): string {
@@ -33,27 +44,13 @@ function getAlignClassName(align: string | undefined): string {
     case "right":
       return " justify-end";
     default:
-      return "";
-  }
-}
-
-function getContainerClassName(
-  appearance: string | undefined,
-  align: string | undefined,
-): string {
-  const alignClass = getAlignClassName(align);
-  switch (appearance) {
-    case "full":
-      return "flex flex-col gap-2" + alignClass;
-    case "grid-2":
-      return "grid grid-cols-2 gap-2";
-    default:
-      return "flex flex-wrap gap-2" + alignClass;
+      return " justify-start";
   }
 }
 
 function getButtonClassName(
   appearance: string | undefined,
+  align: string | undefined,
   selected: boolean,
 ): string {
   const base = "px-4 py-2 border rounded-md text-sm transition-colors";
@@ -61,8 +58,8 @@ function getButtonClassName(
   const state = selected
     ? " bg-primary text-primary-foreground border-primary"
     : " border-border hover:bg-muted";
-  const indicator = " inline-flex items-center justify-center gap-2";
-  return base + width + state + indicator;
+  const layout = " inline-flex items-center gap-2" + getAlignClassName(align);
+  return base + width + state + layout;
 }
 
 export const FormButtonGroupBlock = ({ blockId }: { blockId: string }) => {
@@ -104,7 +101,7 @@ export const FormButtonGroupBlock = ({ blockId }: { blockId: string }) => {
   const describedBy =
     [helperId, errorId].filter(Boolean).join(" ") || undefined;
 
-  const containerClassName = getContainerClassName(appearance, align);
+  const containerClassName = getContainerClassName(appearance);
 
   if (isSingle) {
     return (
@@ -130,7 +127,7 @@ export const FormButtonGroupBlock = ({ blockId }: { blockId: string }) => {
                 aria-checked={selected}
                 onClick={() => field.onChange(opt.value)}
                 disabled={field.disabled}
-                className={getButtonClassName(appearance, selected)}
+                className={getButtonClassName(appearance, align, selected)}
               >
                 <CheckIndicator type={checkIndicator} selected={selected} />
                 <MarkdownInline>{opt.label}</MarkdownInline>
@@ -174,7 +171,7 @@ export const FormButtonGroupBlock = ({ blockId }: { blockId: string }) => {
               aria-checked={selected}
               onClick={() => handleToggle(opt.value)}
               disabled={field.disabled}
-              className={getButtonClassName(appearance, selected)}
+              className={getButtonClassName(appearance, align, selected)}
             >
               <CheckIndicator type={checkIndicator} selected={selected} />
               <MarkdownInline>{opt.label}</MarkdownInline>
