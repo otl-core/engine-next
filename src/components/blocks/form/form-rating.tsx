@@ -1,5 +1,6 @@
 "use client";
 
+import { MarkdownInline } from "@/lib/markdown";
 import { useFormField } from "@otl-core/forms";
 import { HeartIcon, StarIcon, ThumbsUpIcon } from "lucide-react";
 import { useCallback, useMemo } from "react";
@@ -49,7 +50,7 @@ export const FormRatingBlock = ({ blockId }: { blockId: string }) => {
   return (
     <div className="space-y-2">
       <div id={groupId} className="text-sm font-medium">
-        {field.label}
+        <MarkdownInline>{field.label}</MarkdownInline>
         {field.required && <span className="text-destructive ml-1">*</span>}
       </div>
       <div
@@ -87,7 +88,7 @@ export const FormRatingBlock = ({ blockId }: { blockId: string }) => {
       </div>
       {field.helperText && !hasError && (
         <p id={helperId} className="text-xs text-muted-foreground">
-          {field.helperText}
+          <MarkdownInline>{field.helperText}</MarkdownInline>
         </p>
       )}
       {hasError && (

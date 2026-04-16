@@ -1,5 +1,6 @@
 "use client";
 
+import { MarkdownInline } from "@/lib/markdown";
 import { useFormField } from "@otl-core/forms";
 import { useCallback, useMemo } from "react";
 
@@ -10,22 +11,44 @@ function CheckIndicator({
   type: string | undefined;
   selected: boolean;
 }) {
-  if (!selected || !type || type === "none") return null;
+  if (!type || type === "none") return null;
   return (
-    <span className="inline-flex shrink-0" aria-hidden="true">
-      {type === "check" ? "✓" : "●"}
+    <span
+      className={`inline-flex shrink-0 items-center justify-center h-4 w-4 rounded border text-[10px] leading-none transition-colors ${
+        selected
+          ? "border-primary-foreground/50 bg-primary-foreground/20"
+          : "border-border bg-transparent"
+      }`}
+      aria-hidden="true"
+    >
+      {selected ? (type === "check" ? "✓" : "●") : ""}
     </span>
   );
 }
 
-function getContainerClassName(appearance: string | undefined): string {
+function getAlignClassName(align: string | undefined): string {
+  switch (align) {
+    case "center":
+      return " justify-center";
+    case "right":
+      return " justify-end";
+    default:
+      return "";
+  }
+}
+
+function getContainerClassName(
+  appearance: string | undefined,
+  align: string | undefined,
+): string {
+  const alignClass = getAlignClassName(align);
   switch (appearance) {
     case "full":
-      return "flex flex-col gap-2";
+      return "flex flex-col gap-2" + alignClass;
     case "grid-2":
       return "grid grid-cols-2 gap-2";
     default:
-      return "flex flex-wrap gap-2";
+      return "flex flex-wrap gap-2" + alignClass;
   }
 }
 
@@ -70,6 +93,7 @@ export const FormButtonGroupBlock = ({ blockId }: { blockId: string }) => {
       label: string;
     }>) || [];
   const isSingle = !field.additionalSettings.multiple;
+  const align = field.additionalSettings.align as string | undefined;
   const appearance = field.additionalSettings.appearance as string | undefined;
   const checkIndicator = field.additionalSettings.checkIndicator as
     | string
@@ -80,13 +104,13 @@ export const FormButtonGroupBlock = ({ blockId }: { blockId: string }) => {
   const describedBy =
     [helperId, errorId].filter(Boolean).join(" ") || undefined;
 
-  const containerClassName = getContainerClassName(appearance);
+  const containerClassName = getContainerClassName(appearance, align);
 
   if (isSingle) {
     return (
       <div className="space-y-2" role="group" aria-labelledby={groupId}>
         <div id={groupId} className="text-sm font-medium">
-          {field.label}
+          <MarkdownInline>{field.label}</MarkdownInline>
           {field.required && <span className="text-destructive ml-1">*</span>}
         </div>
         <div
@@ -109,14 +133,14 @@ export const FormButtonGroupBlock = ({ blockId }: { blockId: string }) => {
                 className={getButtonClassName(appearance, selected)}
               >
                 <CheckIndicator type={checkIndicator} selected={selected} />
-                {opt.label}
+                <MarkdownInline>{opt.label}</MarkdownInline>
               </button>
             );
           })}
         </div>
         {field.helperText && !hasError && (
           <p id={helperId} className="text-xs text-muted-foreground mt-2">
-            {field.helperText}
+            <MarkdownInline>{field.helperText}</MarkdownInline>
           </p>
         )}
         {hasError && (
@@ -131,7 +155,7 @@ export const FormButtonGroupBlock = ({ blockId }: { blockId: string }) => {
   return (
     <div className="space-y-2" role="group" aria-labelledby={groupId}>
       <div id={groupId} className="text-sm font-medium">
-        {field.label}
+        <MarkdownInline>{field.label}</MarkdownInline>
         {field.required && <span className="text-destructive ml-1">*</span>}
       </div>
       <div
@@ -153,14 +177,14 @@ export const FormButtonGroupBlock = ({ blockId }: { blockId: string }) => {
               className={getButtonClassName(appearance, selected)}
             >
               <CheckIndicator type={checkIndicator} selected={selected} />
-              {opt.label}
+              <MarkdownInline>{opt.label}</MarkdownInline>
             </button>
           );
         })}
       </div>
       {field.helperText && !hasError && (
         <p id={helperId} className="text-xs text-muted-foreground mt-2">
-          {field.helperText}
+          <MarkdownInline>{field.helperText}</MarkdownInline>
         </p>
       )}
       {hasError && (

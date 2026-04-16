@@ -1,6 +1,7 @@
 "use client";
 
 import { Slider } from "@/components/ui/slider";
+import { MarkdownInline } from "@/lib/markdown";
 import { useFormField } from "@otl-core/forms";
 import { useMemo } from "react";
 
@@ -23,7 +24,7 @@ export const FormSliderBlock = ({ blockId }: { blockId: string }) => {
   return (
     <div className="space-y-4">
       <label htmlFor={sliderId} className="text-sm font-medium">
-        {field.label}
+        <MarkdownInline>{field.label}</MarkdownInline>
         {field.required && <span className="text-destructive ml-1">*</span>}
       </label>
       <div className="space-y-2">
@@ -46,7 +47,7 @@ export const FormSliderBlock = ({ blockId }: { blockId: string }) => {
       </div>
       {field.helperText && !hasError && (
         <p id={helperId} className="text-xs text-muted-foreground">
-          {field.helperText}
+          <MarkdownInline>{field.helperText}</MarkdownInline>
         </p>
       )}
       {hasError && (

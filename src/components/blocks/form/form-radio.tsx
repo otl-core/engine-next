@@ -1,5 +1,6 @@
 "use client";
 
+import { MarkdownInline } from "@/lib/markdown";
 import { useFormField } from "@otl-core/forms";
 import { useMemo } from "react";
 
@@ -25,7 +26,7 @@ export const FormRadioBlock = ({ blockId }: { blockId: string }) => {
   return (
     <fieldset className="space-y-2">
       <legend className="text-sm font-medium">
-        {field.label}
+        <MarkdownInline>{field.label}</MarkdownInline>
         {field.required && <span className="text-destructive ml-1">*</span>}
       </legend>
       <div
@@ -52,7 +53,7 @@ export const FormRadioBlock = ({ blockId }: { blockId: string }) => {
                 className="h-4 w-4 border-border"
               />
               <label htmlFor={radioId} className="text-sm cursor-pointer">
-                {opt.label}
+                <MarkdownInline>{opt.label}</MarkdownInline>
               </label>
             </div>
           );
@@ -60,7 +61,7 @@ export const FormRadioBlock = ({ blockId }: { blockId: string }) => {
       </div>
       {field.helperText && !hasError && (
         <p id={helperId} className="text-xs text-muted-foreground mt-2">
-          {field.helperText}
+          <MarkdownInline>{field.helperText}</MarkdownInline>
         </p>
       )}
       {hasError && (

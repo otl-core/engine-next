@@ -1,5 +1,6 @@
 "use client";
 
+import { MarkdownInline } from "@/lib/markdown";
 import { useFormField } from "@otl-core/forms";
 import { useMemo } from "react";
 
@@ -111,7 +112,7 @@ export const FormInputBlock = ({ blockId }: { blockId: string }) => {
   return (
     <div className="w-full space-y-2">
       <label htmlFor={inputId} className="text-sm font-medium">
-        {field.label}
+        <MarkdownInline>{field.label}</MarkdownInline>
         {field.required && <span className="text-destructive ml-1">*</span>}
       </label>
       {isTextarea ? (
@@ -153,7 +154,7 @@ export const FormInputBlock = ({ blockId }: { blockId: string }) => {
       )}
       {field.helperText && !hasError && (
         <p id={helperId} className="text-xs text-muted-foreground">
-          {field.helperText}
+          <MarkdownInline>{field.helperText}</MarkdownInline>
         </p>
       )}
       {hasError && (
