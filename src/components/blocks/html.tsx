@@ -1,10 +1,9 @@
 /**
  * HTML Content Block
- * Renders raw HTML with sanitization
+ * Renders raw HTML from CMS-authored content
  */
 
 import type { BlockComponentProps } from "@otl-core/cms-types";
-import sanitizeHtml from "sanitize-html";
 
 interface HtmlContentConfig {
   content?: string;
@@ -17,7 +16,5 @@ export function HtmlBlock({ config }: BlockComponentProps<HtmlContentConfig>) {
     return null;
   }
 
-  const sanitizedContent = sanitizeHtml(content);
-
-  return <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />;
+  return <div dangerouslySetInnerHTML={{ __html: content }} />;
 }
