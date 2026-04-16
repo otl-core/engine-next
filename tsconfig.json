@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@otl-core/forms": ["../../packages/forms/src/index.ts"]
     }
   },
   "include": [

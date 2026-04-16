@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
   },
   transpilePackages: [
     "@otl-core/block-registry",
+    "@otl-core/forms",
     "@otl-core/next-footer",
     "@otl-core/next-navigation",
     "@otl-core/section-registry",

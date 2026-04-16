@@ -9,7 +9,7 @@ const VARIANT_CLASSES = {
   secondary:
     "bg-secondary text-secondary-foreground hover:bg-secondary/80 border-2 border-secondary",
   outline:
-    "border-2 border-primary text-primary hover:bg-primary/10 bg-transparent",
+    "border-1 border-primary text-primary hover:bg-primary/10 bg-transparent",
   ghost: "text-primary hover:bg-primary/10 border-2 border-transparent",
 } as const;
 
@@ -19,10 +19,10 @@ const SIZE_CLASSES = {
   lg: "px-6 py-3 text-base",
 } as const;
 
-const ALIGN_CLASSES = {
-  left: "justify-start",
-  center: "justify-center",
-  right: "justify-end",
+const LABEL_ALIGN_CLASSES = {
+  left: "justify-start text-left",
+  center: "justify-center text-center",
+  right: "justify-end text-right",
 } as const;
 
 export const FormButtonBlock = ({ blockId }: { blockId: string }) => {
@@ -37,12 +37,12 @@ export const FormButtonBlock = ({ blockId }: { blockId: string }) => {
   if (!action || action.display === "none") return null;
 
   return (
-    <div className={`w-full flex ${ALIGN_CLASSES[action.align]}`}>
+    <div className="w-full">
       <button
         type="button"
         onClick={handleClick}
         disabled={action.disabled || action.loading}
-        className={`inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary ${VARIANT_CLASSES[action.variant]} ${SIZE_CLASSES[action.size]} ${action.disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+        className={`inline-flex w-full items-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary ${LABEL_ALIGN_CLASSES[action.align]} ${VARIANT_CLASSES[action.variant]} ${SIZE_CLASSES[action.size]} ${action.disabled ? "opacity-50 cursor-not-allowed" : ""}`}
       >
         {action.loading ? "Loading..." : action.text}
       </button>
