@@ -48,10 +48,13 @@ import { ListingHeaderBlock } from "@/components/blocks/collection/listing-heade
 
 // Form-specific blocks
 import { FormButtonBlock } from "@/components/blocks/form/form-button";
+import { FormButtonGroupBlock } from "@/components/blocks/form/form-button-group";
 import { FormCheckboxBlock } from "@/components/blocks/form/form-checkbox";
 import { FormInlineGroupBlock } from "@/components/blocks/form/form-inline-group";
 import { FormInputBlock } from "@/components/blocks/form/form-input";
 import { FormRadioBlock } from "@/components/blocks/form/form-radio";
+import { FormRangeBlock } from "@/components/blocks/form/form-range";
+import { FormRatingBlock } from "@/components/blocks/form/form-rating";
 import { FormSelectBlock } from "@/components/blocks/form/form-select";
 import { FormSliderBlock } from "@/components/blocks/form/form-slider";
 import { FormToggleGroupBlock } from "@/components/blocks/form/form-toggle-group";
@@ -106,7 +109,10 @@ blockRegistry.register("form-checkbox", FormCheckboxBlock);
 blockRegistry.register("form-radio", FormRadioBlock);
 blockRegistry.register("form-select", FormSelectBlock);
 blockRegistry.register("form-toggle-group", FormToggleGroupBlock);
+blockRegistry.register("form-button-group", FormButtonGroupBlock);
 blockRegistry.register("form-slider", FormSliderBlock);
+blockRegistry.register("form-range", FormRangeBlock);
+blockRegistry.register("form-rating", FormRatingBlock);
 blockRegistry.register("form-button", FormButtonBlock);
 blockRegistry.register("form-inline-group", FormInlineGroupBlock);
 
