@@ -57,7 +57,6 @@ import { FormRangeBlock } from "@/components/blocks/form/form-range";
 import { FormRatingBlock } from "@/components/blocks/form/form-rating";
 import { FormSelectBlock } from "@/components/blocks/form/form-select";
 import { FormSliderBlock } from "@/components/blocks/form/form-slider";
-import { FormToggleGroupBlock } from "@/components/blocks/form/form-toggle-group";
 
 // Layout blocks (block versions of sections, for nesting)
 import { ContainerLayoutBlock } from "@/components/blocks/container-layout";
@@ -108,7 +107,6 @@ blockRegistry.register("form-input", FormInputBlock);
 blockRegistry.register("form-checkbox", FormCheckboxBlock);
 blockRegistry.register("form-radio", FormRadioBlock);
 blockRegistry.register("form-select", FormSelectBlock);
-blockRegistry.register("form-toggle-group", FormToggleGroupBlock);
 blockRegistry.register("form-button-group", FormButtonGroupBlock);
 blockRegistry.register("form-slider", FormSliderBlock);
 blockRegistry.register("form-range", FormRangeBlock);

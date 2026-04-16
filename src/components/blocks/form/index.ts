@@ -8,8 +8,6 @@ import { FormRangeBlock } from "./form-range";
 import { FormRatingBlock } from "./form-rating";
 import { FormSelectBlock } from "./form-select";
 import { FormSliderBlock } from "./form-slider";
-import { FormToggleGroupBlock } from "./form-toggle-group";
-
 type BlockComponent = React.ComponentType<{
   blockId: string;
   siteId?: string;
@@ -20,7 +18,6 @@ export const formBlockComponents: Record<string, BlockComponent> = {
   "form-checkbox": FormCheckboxBlock,
   "form-radio": FormRadioBlock,
   "form-select": FormSelectBlock,
-  "form-toggle-group": FormToggleGroupBlock,
   "form-button-group": FormButtonGroupBlock,
   "form-slider": FormSliderBlock,
   "form-range": FormRangeBlock,
@@ -40,5 +37,4 @@ export {
   FormRatingBlock,
   FormSelectBlock,
   FormSliderBlock,
-  FormToggleGroupBlock,
 };

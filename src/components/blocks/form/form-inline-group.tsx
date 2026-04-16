@@ -8,7 +8,7 @@ import { FormInputBlock } from "./form-input";
 import { FormRadioBlock } from "./form-radio";
 import { FormSelectBlock } from "./form-select";
 import { FormSliderBlock } from "./form-slider";
-import { FormToggleGroupBlock } from "./form-toggle-group";
+import { FormButtonGroupBlock } from "./form-button-group";
 
 type BlockComponent = ComponentType<{
   blockId: string;
@@ -75,7 +75,7 @@ const inlineGroupBlockLookup: Record<string, BlockComponent> = {
   "form-checkbox": FormCheckboxBlock,
   "form-radio": FormRadioBlock,
   "form-select": FormSelectBlock,
-  "form-toggle-group": FormToggleGroupBlock,
+  "form-button-group": FormButtonGroupBlock,
   "form-slider": FormSliderBlock,
   "form-button": FormButtonBlock,
   "form-inline-group": FormInlineGroupBlock,
