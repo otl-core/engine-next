@@ -7,8 +7,10 @@
 import {
   BlockRegistry,
   registerAnalyticsWrapper,
+  registerBlockStyleWrapper,
 } from "@otl-core/block-registry";
 import { BlockAnalyticsWrapper } from "@otl-core/analytics";
+import BlockStyleWrapper from "@/components/blocks/block-style-wrapper";
 
 // Standard content blocks
 import { AccordionBlock } from "@/components/blocks/accordion";
@@ -121,6 +123,9 @@ blockRegistry.register("container-layout", ContainerLayoutBlock);
 
 // Register the block-level analytics wrapper so BlockRenderer wraps blocks
 registerAnalyticsWrapper(BlockAnalyticsWrapper);
+
+// Register the block style wrapper so all blocks get styling support
+registerBlockStyleWrapper(BlockStyleWrapper);
 
 /**
  * Custom Blocks
