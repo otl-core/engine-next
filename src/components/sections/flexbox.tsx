@@ -15,9 +15,9 @@ import SectionWrapper from "./section-wrapper";
 
 interface FlexboxConfig extends SectionBaseConfig {
   children?: BlockInstance[];
-  direction?: "row" | "column";
-  justify?: "start" | "center" | "end" | "between" | "around";
-  align?: "start" | "center" | "end" | "stretch";
+  direction?: ResponsiveValue<string>;
+  justify?: ResponsiveValue<string>;
+  align?: ResponsiveValue<string>;
   gap?: ResponsiveValue<string>;
   wrap?: boolean;
 }

@@ -6,7 +6,7 @@
 
 import { BlockRegistry, BlockRenderer } from "@otl-core/block-registry";
 import type { BlockInstance, ResponsiveValue } from "@otl-core/cms-types";
-import { cn } from "@otl-core/style-utils";
+import { cn, normalizeResponsiveValue } from "@otl-core/style-utils";
 import { BREAKPOINTS } from "@/lib/breakpoints";
 
 // --- Types ---
@@ -16,8 +16,8 @@ export interface GridLayoutConfig {
   columns?: ResponsiveValue<string>;
   columnGap?: ResponsiveValue<string>;
   rowGap?: ResponsiveValue<string>;
-  alignItems?: "start" | "center" | "end" | "stretch";
-  justifyItems?: "start" | "center" | "end" | "stretch";
+  alignItems?: ResponsiveValue<string>;
+  justifyItems?: ResponsiveValue<string>;
   autoFlow?: "row" | "column" | "dense";
 }
 
@@ -92,15 +92,28 @@ export function generateGridCSS(
   columns: ResponsiveValue<string> | undefined,
   colGap: ResponsiveValue<string>,
   rowGap: ResponsiveValue<string>,
+  alignItems?: ResponsiveValue<string>,
+  justifyItems?: ResponsiveValue<string>,
 ): string {
   const normalizedColumns = normalizeColumns(columns);
   const resolvedColGap = resolveResponsive(colGap, "1rem");
   const resolvedRowGap = resolveResponsive(rowGap, "1rem");
+  const normalizedAlign = normalizeResponsiveValue(alignItems);
+  const normalizedJustify = normalizeResponsiveValue(justifyItems);
   const css: string[] = [];
 
-  css.push(
-    `#${gridId} { grid-template-columns: ${normalizedColumns.base}; column-gap: ${resolvedColGap.base}; row-gap: ${resolvedRowGap.base}; }`,
-  );
+  const baseStyles = [
+    `grid-template-columns: ${normalizedColumns.base}`,
+    `column-gap: ${resolvedColGap.base}`,
+    `row-gap: ${resolvedRowGap.base}`,
+  ];
+  if (normalizedAlign.base) {
+    baseStyles.push(`align-items: ${normalizedAlign.base}`);
+  }
+  if (normalizedJustify.base) {
+    baseStyles.push(`justify-items: ${normalizedJustify.base}`);
+  }
+  css.push(`#${gridId} { ${baseStyles.map((s) => s + ";").join(" ")} }`);
 
   for (const { key, minWidth } of BREAKPOINTS) {
     const parts: string[] = [];
@@ -110,6 +123,10 @@ export function generateGridCSS(
     if (colGapValue) parts.push(`column-gap: ${colGapValue};`);
     const rowGapValue = resolvedRowGap[key];
     if (rowGapValue) parts.push(`row-gap: ${rowGapValue};`);
+    const alignBp = normalizedAlign[key];
+    if (alignBp) parts.push(`align-items: ${alignBp};`);
+    const justifyBp = normalizedJustify[key];
+    if (justifyBp) parts.push(`justify-items: ${justifyBp};`);
     if (parts.length > 0) {
       css.push(
         `@media (min-width: ${minWidth}) { #${gridId} { ${parts.join(" ")} } }`,
@@ -133,7 +150,7 @@ export default function GridLayout({
     columns,
     columnGap = "1rem",
     rowGap = "1rem",
-    alignItems = "start",
+    alignItems,
     justifyItems,
     autoFlow,
   } = config;
@@ -142,21 +159,6 @@ export default function GridLayout({
     return null;
   }
 
-  const alignmentMap: Record<string, string> = {
-    center: "items-center",
-    end: "items-end",
-    stretch: "items-stretch",
-  };
-  const alignmentClass = alignmentMap[alignItems] || "items-start";
-
-  const justifyMap: Record<string, string> = {
-    center: "justify-items-center",
-    end: "justify-items-end",
-    stretch: "justify-items-stretch",
-    start: "justify-items-start",
-  };
-  const justifyClass = (justifyItems && justifyMap[justifyItems]) || "";
-
   const autoFlowMap: Record<string, string> = {
     column: "grid-flow-col",
     dense: "grid-flow-dense",
@@ -164,13 +166,17 @@ export default function GridLayout({
   const autoFlowClass = (autoFlow && autoFlowMap[autoFlow]) || "";
 
   return (
-    <div
-      id={gridId}
-      className={cn("grid", alignmentClass, justifyClass, autoFlowClass)}
-    >
+    <div id={gridId} className={cn("grid", autoFlowClass)}>
       <style
         dangerouslySetInnerHTML={{
-          __html: generateGridCSS(gridId, columns, columnGap, rowGap),
+          __html: generateGridCSS(
+            gridId,
+            columns,
+            columnGap,
+            rowGap,
+            alignItems,
+            justifyItems,
+          ),
         }}
       />
       {children.map((child, index) => {

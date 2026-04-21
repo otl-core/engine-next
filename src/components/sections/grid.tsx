@@ -17,10 +17,10 @@ import SectionWrapper from "./section-wrapper";
 interface GridConfig extends SectionBaseConfig {
   children?: BlockInstance[];
   columns?: ResponsiveValue<string>;
-  columnGap?: string;
-  rowGap?: string;
-  alignItems?: "start" | "center" | "end" | "stretch";
-  justifyItems?: "start" | "center" | "end" | "stretch";
+  columnGap?: ResponsiveValue<string>;
+  rowGap?: ResponsiveValue<string>;
+  alignItems?: ResponsiveValue<string>;
+  justifyItems?: ResponsiveValue<string>;
   autoFlow?: "row" | "column" | "dense";
 }
 

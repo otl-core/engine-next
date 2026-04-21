@@ -16,14 +16,22 @@ import type {
 interface FlexboxLayoutBlockProps {
   config: {
     children?: BlockInstance[];
-    direction?: "row" | "column";
-    justify?: "start" | "center" | "end" | "between" | "around";
-    align?: "start" | "center" | "end" | "stretch";
+    direction?: ResponsiveValue<string>;
+    justify?: ResponsiveValue<string>;
+    align?: ResponsiveValue<string>;
     gap?: ResponsiveValue<string>;
     wrap?: boolean;
     padding?: ResponsiveValue<string>;
     margin?: ResponsiveValue<string>;
-    color?: ColorReference;
+    color?: ResponsiveValue<ColorReference>;
+    borderRadius?: ResponsiveValue<string>;
+    verticalAlign?: ResponsiveValue<string>;
+    width?: ResponsiveValue<string>;
+    minWidth?: ResponsiveValue<string>;
+    maxWidth?: ResponsiveValue<string>;
+    height?: ResponsiveValue<string>;
+    minHeight?: ResponsiveValue<string>;
+    maxHeight?: ResponsiveValue<string>;
   };
   siteId?: string;
   blockRegistry: BlockRegistry;
@@ -34,10 +42,35 @@ export function FlexboxLayoutBlock({
   siteId,
   blockRegistry,
 }: FlexboxLayoutBlockProps) {
-  const { padding, margin, color, ...flexConfig } = config;
+  const {
+    padding,
+    margin,
+    color,
+    borderRadius,
+    verticalAlign,
+    width,
+    minWidth,
+    maxWidth,
+    height,
+    minHeight,
+    maxHeight,
+    ...flexConfig
+  } = config;
 
   return (
-    <BlockWrapper padding={padding} margin={margin} color={color}>
+    <BlockWrapper
+      padding={padding}
+      margin={margin}
+      color={color}
+      borderRadius={borderRadius}
+      verticalAlign={verticalAlign}
+      width={width}
+      minWidth={minWidth}
+      maxWidth={maxWidth}
+      height={height}
+      minHeight={minHeight}
+      maxHeight={maxHeight}
+    >
       <FlexboxLayout
         config={flexConfig}
         blockRegistry={blockRegistry}

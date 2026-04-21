@@ -1,7 +1,7 @@
 /**
  * Container Layout Block
  * Block version of the Container section -- renders ContainerLayout without SectionWrapper.
- * Used for nesting a width-constrained container inside other sections.
+ * Dimension controls (width, maxWidth, etc.) are handled by BlockWrapper.
  */
 
 import BlockWrapper from "@/components/blocks/block-wrapper";
@@ -16,21 +16,18 @@ import type {
 interface ContainerLayoutBlockProps {
   config: {
     child?: BlockInstance[];
-    width?:
-      | "small"
-      | "medium"
-      | "large"
-      | "extra-large"
-      | "wide"
-      | "full"
-      | "text-optimized"
-      | "container"
-      | "custom";
-    customWidth?: number;
     centered?: boolean;
     padding?: ResponsiveValue<string>;
     margin?: ResponsiveValue<string>;
-    color?: ColorReference;
+    color?: ResponsiveValue<ColorReference>;
+    borderRadius?: ResponsiveValue<string>;
+    verticalAlign?: ResponsiveValue<string>;
+    width?: ResponsiveValue<string>;
+    minWidth?: ResponsiveValue<string>;
+    maxWidth?: ResponsiveValue<string>;
+    height?: ResponsiveValue<string>;
+    minHeight?: ResponsiveValue<string>;
+    maxHeight?: ResponsiveValue<string>;
   };
   siteId?: string;
   blockRegistry: BlockRegistry;
@@ -41,10 +38,35 @@ export function ContainerLayoutBlock({
   siteId,
   blockRegistry,
 }: ContainerLayoutBlockProps) {
-  const { padding, margin, color, ...containerConfig } = config;
+  const {
+    padding,
+    margin,
+    color,
+    borderRadius,
+    verticalAlign,
+    width,
+    minWidth,
+    maxWidth,
+    height,
+    minHeight,
+    maxHeight,
+    ...containerConfig
+  } = config;
 
   return (
-    <BlockWrapper padding={padding} margin={margin} color={color}>
+    <BlockWrapper
+      padding={padding}
+      margin={margin}
+      color={color}
+      borderRadius={borderRadius}
+      verticalAlign={verticalAlign}
+      width={width}
+      minWidth={minWidth}
+      maxWidth={maxWidth}
+      height={height}
+      minHeight={minHeight}
+      maxHeight={maxHeight}
+    >
       <ContainerLayout
         config={containerConfig}
         blockRegistry={blockRegistry}

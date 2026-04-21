@@ -6,14 +6,14 @@
 
 import { BlockRegistry, BlockRenderer } from "@otl-core/block-registry";
 import type { BlockInstance, ResponsiveValue } from "@otl-core/cms-types";
-import { cn } from "@otl-core/style-utils";
+import { cn, normalizeResponsiveValue } from "@otl-core/style-utils";
 import { BREAKPOINTS } from "@/lib/breakpoints";
 
 export interface FlexboxLayoutConfig {
   children?: BlockInstance[];
-  direction?: "row" | "column";
-  justify?: "start" | "center" | "end" | "between" | "around";
-  align?: "start" | "center" | "end" | "stretch";
+  direction?: ResponsiveValue<string>;
+  justify?: ResponsiveValue<string>;
+  align?: ResponsiveValue<string>;
   gap?: ResponsiveValue<string>;
   wrap?: boolean;
 }
@@ -24,46 +24,86 @@ interface FlexboxLayoutProps {
   siteId?: string;
 }
 
-const DIRECTION_MAP: Record<string, string> = {
-  row: "flex-row",
-  column: "flex-col",
+const DIRECTION_CSS: Record<string, string> = {
+  row: "row",
+  column: "column",
 };
 
-const JUSTIFY_MAP: Record<string, string> = {
-  start: "justify-start",
-  center: "justify-center",
-  end: "justify-end",
-  between: "justify-between",
-  around: "justify-around",
+const JUSTIFY_CSS: Record<string, string> = {
+  start: "flex-start",
+  center: "center",
+  end: "flex-end",
+  between: "space-between",
+  around: "space-around",
 };
 
-const ALIGN_MAP: Record<string, string> = {
-  start: "items-start",
-  center: "items-center",
-  end: "items-end",
-  stretch: "items-stretch",
+const ALIGN_CSS: Record<string, string> = {
+  start: "flex-start",
+  center: "center",
+  end: "flex-end",
+  stretch: "stretch",
 };
 
-function resolveGap(
+function generateFlexCSS(
+  flexId: string,
+  direction: ResponsiveValue<string> | undefined,
+  justify: ResponsiveValue<string> | undefined,
+  align: ResponsiveValue<string> | undefined,
   gap: ResponsiveValue<string> | undefined,
-  defaultGap: string,
-): { baseGap: string; responsiveCss: string | null; id: string } {
-  const id = `flex-${crypto.randomUUID().slice(0, 9)}`;
+): string {
+  const normalizedDirection = normalizeResponsiveValue(direction);
+  const normalizedJustify = normalizeResponsiveValue(justify);
+  const normalizedAlign = normalizeResponsiveValue(align);
+  const normalizedGap = normalizeResponsiveValue(gap);
 
-  if (gap === undefined || typeof gap === "string") {
-    return { baseGap: gap ?? defaultGap, responsiveCss: null, id };
+  const css: string[] = [];
+  const target = `#${flexId}`;
+
+  // Base styles
+  const baseStyles: string[] = [];
+  if (normalizedDirection.base) {
+    baseStyles.push(
+      `flex-direction:${DIRECTION_CSS[normalizedDirection.base] || "row"}`,
+    );
+  }
+  if (normalizedJustify.base) {
+    baseStyles.push(
+      `justify-content:${JUSTIFY_CSS[normalizedJustify.base] || "flex-start"}`,
+    );
+  }
+  if (normalizedAlign.base) {
+    baseStyles.push(
+      `align-items:${ALIGN_CSS[normalizedAlign.base] || "flex-start"}`,
+    );
+  }
+  if (normalizedGap.base) {
+    baseStyles.push(`gap:${normalizedGap.base}`);
+  }
+  if (baseStyles.length > 0) {
+    css.push(`${target}{${baseStyles.join(";")}}`);
   }
 
-  // ResponsiveConfig -- generate CSS media queries
-  const baseGap = gap.base ?? defaultGap;
-  const rules = BREAKPOINTS.filter((bp) => gap[bp.key] !== undefined)
-    .map(
-      (bp) =>
-        `@media (min-width: ${bp.minWidth}) { #${id} { gap: ${gap[bp.key]}; } }`,
-    )
-    .join("\n");
+  // Responsive styles
+  for (const { key, minWidth } of BREAKPOINTS) {
+    const styles: string[] = [];
+    const dirBp = normalizedDirection[key];
+    if (dirBp) styles.push(`flex-direction:${DIRECTION_CSS[dirBp] || "row"}`);
+    const justBp = normalizedJustify[key];
+    if (justBp)
+      styles.push(`justify-content:${JUSTIFY_CSS[justBp] || "flex-start"}`);
+    const alignBp = normalizedAlign[key];
+    if (alignBp)
+      styles.push(`align-items:${ALIGN_CSS[alignBp] || "flex-start"}`);
+    const gapBp = normalizedGap[key];
+    if (gapBp) styles.push(`gap:${gapBp}`);
+    if (styles.length > 0) {
+      css.push(
+        `@media (min-width:${minWidth}){${target}{${styles.join(";")}}}`,
+      );
+    }
+  }
 
-  return { baseGap, responsiveCss: rules || null, id };
+  return css.join("");
 }
 
 export default function FlexboxLayout({
@@ -73,9 +113,9 @@ export default function FlexboxLayout({
 }: FlexboxLayoutProps) {
   const {
     children = [],
-    direction = "row",
-    justify = "start",
-    align = "start",
+    direction,
+    justify,
+    align,
     gap,
     wrap = false,
   } = config;
@@ -84,24 +124,13 @@ export default function FlexboxLayout({
     return null;
   }
 
-  const { baseGap, responsiveCss, id: flexId } = resolveGap(gap, "1rem");
+  const flexId = `flex-${crypto.randomUUID().slice(0, 9)}`;
+  const flexCSS = generateFlexCSS(flexId, direction, justify, align, gap);
 
   return (
     <>
-      {responsiveCss && (
-        <style dangerouslySetInnerHTML={{ __html: responsiveCss }} />
-      )}
-      <div
-        id={flexId}
-        className={cn(
-          "flex",
-          DIRECTION_MAP[direction] || "flex-row",
-          JUSTIFY_MAP[justify] || "justify-start",
-          ALIGN_MAP[align] || "items-start",
-          wrap && "flex-wrap",
-        )}
-        style={{ gap: baseGap }}
-      >
+      {flexCSS && <style dangerouslySetInnerHTML={{ __html: flexCSS }} />}
+      <div id={flexId} className={cn("flex", wrap && "flex-wrap")}>
         {children.map((child, index) => (
           <div key={child.id || `child-${child.type}-${index}`}>
             <BlockRenderer
