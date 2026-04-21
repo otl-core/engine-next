@@ -72,6 +72,25 @@ const DIMENSION_PROPS = [
   { key: "maxHeight", css: "max-height" },
 ] as const;
 
+/**
+ * Validate that a value is a valid CSS dimension (not a preset keyword like "container").
+ * Accepts: values with numbers (40rem, 100px, 50%), CSS keywords (auto, none, fit-content),
+ * and CSS functions (calc(), clamp(), var()).
+ * Rejects: preset strings like "container", "small", "medium", "large", "full".
+ */
+function isValidCSSDimension(value: string): boolean {
+  const v = value.trim();
+  if (
+    /^(auto|none|inherit|initial|unset|revert|fit-content|max-content|min-content)$/.test(
+      v,
+    )
+  )
+    return true;
+  if (/\d/.test(v)) return true;
+  if (/^(calc|clamp|min|max|var|env)\(/.test(v)) return true;
+  return false;
+}
+
 function generateBlockCSS(
   blockId: string,
   padding: ResponsiveValue<string> | undefined,
@@ -128,7 +147,12 @@ function generateBlockCSS(
   }
   for (const dim of normalizedDimensions) {
     const baseVal = dim.values.base;
-    if (baseVal && baseVal !== "auto" && baseVal !== "none") {
+    if (
+      baseVal &&
+      baseVal !== "auto" &&
+      baseVal !== "none" &&
+      isValidCSSDimension(baseVal)
+    ) {
       baseStyles.push(`${dim.css}:${baseVal}`);
     }
   }
@@ -163,7 +187,8 @@ function generateBlockCSS(
     }
     for (const dim of normalizedDimensions) {
       const dimBp = dim.values[key];
-      if (dimBp) styles.push(`${dim.css}:${dimBp}`);
+      if (dimBp && isValidCSSDimension(dimBp))
+        styles.push(`${dim.css}:${dimBp}`);
     }
 
     if (styles.length > 0) {
