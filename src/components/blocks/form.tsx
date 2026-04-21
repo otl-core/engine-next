@@ -163,7 +163,7 @@ function FormRenderer({
   document: FormDocument;
   siteId: string;
 }) {
-  const { settings, currentPage } = useForm();
+  const { settings, currentPage, globalError } = useForm();
 
   // Filter pages for progress indicator (exclude pages with exclude_from_progress)
   const progressPages = document.pages.filter(
@@ -218,6 +218,12 @@ function FormRenderer({
               })}
             </div>
           )}
+        </div>
+      )}
+
+      {globalError && (
+        <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+          {globalError}
         </div>
       )}
 
